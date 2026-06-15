@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>On-Site Availability — Jacob &amp; Julia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --panel:#fbfaf6; --ink:#1d1c1a; --muted:#6f6a60; --line:#e2ddd1;
+    --busy:#d9d3c6; --busy-ink:#7c7466;
+    --cust:#dfe8d6; --cust-ink:#4f6b3a; --cust-bar:#6f9148;
+    --free:#0f7a6b; --free-soft:#e3f1ee; --free-ink:#0a5a4f;
+    --accent:#c2683a;
+    --shadow:0 1px 2px rgba(40,35,25,.06),0 8px 24px rgba(40,35,25,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(120% 80% at 100% 0%, #efe9dc 0%, transparent 55%),var(--bg);
+    color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;padding:24px 16px 56px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+  header{margin-bottom:18px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 6px}
+  h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(26px,6vw,38px);line-height:1.05;margin:0;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13.5px;margin:8px 0 0;max-width:48ch}
+  .daynav{display:flex;align-items:center;gap:10px;margin:20px 0 14px}
+  .daynav button{border:1px solid var(--line);background:var(--panel);color:var(--ink);width:36px;height:36px;border-radius:10px;font-size:17px;cursor:pointer;display:grid;place-items:center;transition:.15s;line-height:1}
+  .daynav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  .daynav button:disabled{opacity:.35;cursor:default}
+  .daylabel{flex:1;text-align:center}
+  .daylabel .dow{font-family:"Fraunces",serif;font-size:20px;font-weight:600;display:block;line-height:1.1}
+  .daylabel .date{font-size:12px;color:var(--muted);letter-spacing:.02em}
+  .today-pill{display:inline-block;margin-left:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--free-ink);background:var(--free-soft);padding:2px 7px;border-radius:999px;vertical-align:middle;font-weight:600}
+  .board{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 14px 18px;overflow:hidden}
+  .names{display:grid;grid-template-columns:46px 1fr 1fr;gap:8px;margin-bottom:6px}
+  .names .who{text-align:center;font-weight:600;font-size:14px;padding:6px 0;border-bottom:2px solid var(--ink)}
+  .grid{display:grid;grid-template-columns:46px 1fr 1fr;gap:8px}
+  .axis{position:relative}
+  .axis .tick{position:absolute;left:0;right:0;font-size:10.5px;color:var(--muted);transform:translateY(-50%);text-align:right;padding-right:6px;letter-spacing:.02em}
+  .col{position:relative;border-radius:10px;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hourpx) - 1px),var(--line) calc(var(--hourpx) - 1px),var(--line) var(--hourpx));border:1px solid var(--line)}
+  .block{position:absolute;left:4px;right:4px;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:.02em;animation:rise .45s cubic-bezier(.2,.7,.2,1) backwards}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .block.free{background:var(--free-soft);color:var(--free-ink);border:1px solid #cfe6e0;box-shadow:inset 3px 0 0 var(--free)}
+  .block.busy{background:var(--busy);color:var(--busy-ink);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px)}
+  .block.cust{background:var(--cust);color:var(--cust-ink);box-shadow:inset 3px 0 0 var(--cust-bar)}
+  .block .lbl{padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .block.tiny .lbl{display:none}
+  .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+  .sw.free{background:var(--free-soft);box-shadow:inset 3px 0 0 var(--free)}
+  .sw.cust{background:var(--cust);box-shadow:inset 3px 0 0 var(--cust-bar)}
+  .sw.busy{background:var(--busy);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.4) 0 4px,transparent 4px 8px)}
+  footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+  .synced{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--free);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(15,122,107,.4)}70%{box-shadow:0 0 0 7px rgba(15,122,107,0)}100%{box-shadow:0 0 0 0 rgba(15,122,107,0)}}
+  .dot.stale{background:var(--accent);animation:none}
+  .refresh{border:none;background:none;color:var(--accent);cursor:pointer;font:inherit;font-weight:600}
+  .banner{margin-top:12px;font-size:12px;color:var(--accent);background:#fbeee6;border:1px solid #f0d6c4;border-radius:10px;padding:8px 12px}
+  .tzbar{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:12px;color:var(--free-ink);background:var(--free-soft);border:1px solid #cfe6e0;border-radius:10px;padding:8px 12px}
+  .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
+  @media(max-width:480px){
+    body{padding:16px 10px 48px}
+    .names,.grid{grid-template-columns:38px 1fr 1fr;gap:6px}
+    .block .lbl{font-size:10px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">TEST &middot; SingHealth · NGEMR On-Site</p>
+    <h1>Analyst Availability</h1>
+    <p class="sub">Free/busy for Jacob &amp; Julia on declared on-site days, shown in your local timezone. Customer meetings show a generic label; all other time shows as Busy.</p>
+  </header>
+
+  <div class="daynav">
+    <button id="prev" aria-label="Previous on-site day">‹</button>
+    <div class="daylabel">
+      <span class="dow" id="dow">—</span>
+      <span class="date" id="date"></span>
+    </div>
+    <button id="next" aria-label="Next on-site day">›</button>
+  </div>
+
+  <div class="tzbar" id="tzbar"></div>
+
+  <div class="board">
+    <div class="names">
+      <div></div>
+      <div class="who">Jacob</div>
+      <div class="who">Julia</div>
+    </div>
+    <div class="grid" id="grid">
+      <div class="axis" id="axis"></div>
+      <div class="col" id="colJacob"></div>
+      <div class="col" id="colJulia"></div>
+    </div>
+    <div class="legend">
+      <span><i class="sw free"></i> Free — open for 1:1</span>
+      <span><i class="sw cust"></i> Customer meeting</span>
+      <span><i class="sw busy"></i> Busy</span>
+    </div>
+  </div>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <footer>
+    <span class="synced"><i class="dot" id="dot"></i><span id="syncedTxt">Loading…</span></span>
+    <button class="refresh" id="refresh">Refresh now</button>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG
+   1) DATA_URL — paste your public availability.json URL.
+      Leave "" to preview with sample data.
+   2) DECLARED_DAYS — fallback list of on-site dates (SGT, YYYY-MM-DD)
+      used only if the JSON does not supply its own "days" array.
+      In production the flow/server owns "days" and this is ignored.
+   ============================================================ */
+const DATA_URL = "";
+const DECLARED_DAYS = ["2026-06-03","2026-06-05","2026-06-10","2026-06-12"];
+
+const DAY_START=9, DAY_END=18, HOURS=DAY_END-DAY_START, HOUR_PX=56;
+const REFRESH_MS=5*60*1000;
+// Display timezone. Every instant in the JSON is UTC; we ALWAYS render in the analyst's own
+// local timezone (their current location). That's the intended UX — e.g. a remote analyst
+// out sick during on-site week still sees times in their own zone. A banner states this, and
+// we deliberately do NOT override to the customer-site zone.
+let DISPLAY_TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "Asia/Singapore";
+const DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function zparts(iso){
+  const f=new Intl.DateTimeFormat("en-CA",{timeZone:DISPLAY_TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
+  const p=Object.fromEntries(f.formatToParts(new Date(iso)).map(x=>[x.type,x.value]));
+  return {date:`${p.year}-${p.month}-${p.day}`, hours:(p.hour==="24"?0:+p.hour)+(+p.minute)/60};
+}
+function sgtKey(iso){ return zparts(iso).date; }       // local day bucket for an instant
+function sgtHour(iso){ return zparts(iso).hours; }     // local fractional hour for an instant
+function todayKeyTZ(){ return zparts(new Date().toISOString()).date; }
+function keyOf(d){ return d.toISOString().slice(0,10); }
+function parseKey(s){ const [y,m,d]=s.split("-").map(Number); return new Date(Date.UTC(y,m-1,d)); }
+
+let DATA=null, DAYS=[], idx=null;
+
+function buildDays(){
+  const list=(DATA && Array.isArray(DATA.days) && DATA.days.length)?DATA.days:DECLARED_DAYS;
+  return [...new Set(list)].sort().map(parseKey);
+}
+function defaultIndex(){
+  const today=todayKeyTZ();
+  const i=DAYS.findIndex(d=>keyOf(d)>=today);
+  return i<0?Math.max(0,DAYS.length-1):i;
+}
+
+function sampleData(){
+  const days=DECLARED_DAYS;
+  const dk=days[0];
+  const at=(h,m)=>{ const d=parseKey(dk); return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate(),h-8,m||0)).toISOString(); };
+  return {
+    updated:new Date().toISOString(), sample:true, days,
+    people:[
+      {name:"Jacob", busy:[
+        {start:at(9,0),end:at(10,30),label:"SingHealth — OpTime build"},
+        {start:at(13,0),end:at(14,0)},                                  // other domain -> Busy
+        {start:at(15,30),end:at(17,0),label:"Synapxe — integration sync"}
+      ]},
+      {name:"Julia", busy:[
+        {start:at(9,30),end:at(11,0),label:"SingHealth — Anaesthesia"},
+        {start:at(11,30),end:at(12,30)},
+        {start:at(14,0),end:at(16,0),label:"SingHealth — go-live readiness"}
+      ]}
+    ]
+  };
+}
+
+function blocksFor(person, dayKey){
+  const items=(person?.busy||[])
+    .filter(b=>sgtKey(b.start)===dayKey)
+    .map(b=>({s:Math.max(DAY_START,sgtHour(b.start)), e:Math.min(DAY_END,sgtHour(b.end)), label:(b.label||"").trim()}))
+    .filter(b=>b.e>b.s)
+    .sort((a,b)=>a.s-b.s||a.e-b.e);
+  const union=[];
+  for(const b of items){
+    const last=union[union.length-1];
+    if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e});
+  }
+  const free=[]; let cur=DAY_START;
+  for(const b of union){ if(b.s>cur) free.push({s:cur,e:b.s}); cur=Math.max(cur,b.e); }
+  if(cur<DAY_END) free.push({s:cur,e:DAY_END});
+  return {busy:items, free};
+}
+
+function fmt(h){ const hh=Math.floor(h),mm=Math.round((h-hh)*60),ap=hh>=12?"pm":"am";let h12=hh%12;if(h12===0)h12=12;return mm?`${h12}:${String(mm).padStart(2,"0")}${ap}`:`${h12}${ap}`; }
+function esc(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function renderAxis(){
+  const ax=document.getElementById("axis"); ax.style.height=(HOURS*HOUR_PX)+"px"; ax.innerHTML="";
+  for(let h=DAY_START;h<=DAY_END;h++){ const t=document.createElement("div"); t.className="tick"; t.style.top=((h-DAY_START)*HOUR_PX)+"px"; t.textContent=fmt(h); ax.appendChild(t); }
+}
+function renderCol(elId, person, dayKey){
+  const col=document.getElementById(elId);
+  col.style.setProperty("--hourpx",HOUR_PX+"px"); col.style.height=(HOURS*HOUR_PX)+"px"; col.innerHTML="";
+  if(!person) return;
+  const {busy,free}=blocksFor(person,dayKey); let n=0;
+  const add=(b,cls,text)=>{
+    const el=document.createElement("div");
+    const top=(b.s-DAY_START)*HOUR_PX, h=(b.e-b.s)*HOUR_PX;
+    el.className="block "+cls+(h<22?" tiny":"");
+    el.style.top=top+"px"; el.style.height=(h-2)+"px"; el.style.animationDelay=(n++*45)+"ms";
+    el.innerHTML=`<span class="lbl">${esc(text)} · ${fmt(b.s)}–${fmt(b.e)}</span>`;
+    col.appendChild(el);
+  };
+  free.forEach(b=>add(b,"free","Free"));
+  busy.forEach(b=>add(b, b.label?"cust":"busy", b.label||"Busy"));
+}
+
+function renderDay(){
+  const grid=document.getElementById("grid");
+  // Opt-in gate fallback: if the team hasn't published availability, show a clean message
+  // (never an error). The launch menu should already hide the option in this case.
+  if(DATA && DATA.available===false){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1">Availability isn't published for this team.</div>`;
+    document.getElementById("dow").textContent="—"; document.getElementById("date").textContent="";
+    document.getElementById("prev").disabled=true; document.getElementById("next").disabled=true;
+    return;
+  }
+  if(!DAYS.length){ grid.innerHTML=`<div class="empty" style="grid-column:1/-1">No on-site days declared yet.</div>`; document.getElementById("dow").textContent="—"; document.getElementById("date").textContent=""; return; }
+  if(idx===null||idx<0||idx>=DAYS.length) idx=defaultIndex();
+  const d=DAYS[idx];
+  document.getElementById("dow").textContent=DOW[d.getUTCDay()];
+  const todayKey=todayKeyTZ();
+  document.getElementById("date").innerHTML=`${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`+(keyOf(d)===todayKey?` <span class="today-pill">Today</span>`:``);
+  document.getElementById("prev").disabled=idx<=0;
+  document.getElementById("next").disabled=idx>=DAYS.length-1;
+  const dayKey=keyOf(d);
+  const find=n=>DATA?.people?.find(p=>p.name?.toLowerCase().startsWith(n));
+  renderCol("colJacob", find("jacob"), dayKey);
+  renderCol("colJulia", find("julia"), dayKey);
+}
+
+function relTime(iso){ const s=Math.round((Date.now()-new Date(iso).getTime())/1000); if(s<60)return"just now"; if(s<3600)return Math.floor(s/60)+" min ago"; if(s<86400)return Math.floor(s/3600)+" hr ago"; return Math.floor(s/86400)+" d ago"; }
+function renderStatus(){
+  const dot=document.getElementById("dot"),txt=document.getElementById("syncedTxt"),banner=document.getElementById("banner");
+  if(!DATA){ txt.textContent="No data"; return; }
+  const stale=(Date.now()-new Date(DATA.updated).getTime())>90*60*1000;
+  dot.classList.toggle("stale",stale);
+  txt.textContent="Calendar synced "+relTime(DATA.updated);
+  if(DATA.sample){ banner.hidden=false; banner.textContent="Preview mode — showing sample times. Paste your availability.json URL into DATA_URL to go live."; } else banner.hidden=true;
+}
+
+function setTzBar(){
+  const el=document.getElementById("tzbar");
+  if(el) el.innerHTML='🕒 Times shown in <strong>your local time</strong> — '+DISPLAY_TZ;
+}
+
+async function load(){
+  try{
+    if(!DATA_URL){ DATA=sampleData(); }
+    else{ const r=await fetch(DATA_URL,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); DATA=await r.json(); }
+  }catch(e){
+    const banner=document.getElementById("banner"); banner.hidden=false;
+    banner.textContent="Couldn't load availability data ("+e.message+"). Check the DATA_URL and that the link is public.";
+    if(!DATA) DATA=sampleData();
+  }
+  DAYS=buildDays();
+  renderDay(); renderStatus();
+}
+
+document.getElementById("prev").onclick=()=>{ if(idx>0){idx--;renderDay();} };
+document.getElementById("next").onclick=()=>{ if(idx<DAYS.length-1){idx++;renderDay();} };
+document.getElementById("refresh").onclick=load;
+
+renderAxis(); setTzBar(); load();
+setInterval(load,REFRESH_MS); setInterval(renderStatus,30000);
+</script>
+</body>
+</html>
