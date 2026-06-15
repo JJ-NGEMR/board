@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>On-Site Availability — Jacob &amp; Julia</title>
+<title>Jacob and Julia's Onsite Availability</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,21 +25,40 @@
     -webkit-font-smoothing:antialiased;min-height:100vh;padding:24px 16px 56px;
   }
   .wrap{max-width:760px;margin:0 auto}
-  header{margin-bottom:18px}
+  header{margin-bottom:14px}
   .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 6px}
-  h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(26px,6vw,38px);line-height:1.05;margin:0;letter-spacing:-.01em}
-  .sub{color:var(--muted);font-size:13.5px;margin:8px 0 0;max-width:48ch}
-  .daynav{display:flex;align-items:center;gap:10px;margin:20px 0 14px}
-  .daynav button{border:1px solid var(--line);background:var(--panel);color:var(--ink);width:36px;height:36px;border-radius:10px;font-size:17px;cursor:pointer;display:grid;place-items:center;transition:.15s;line-height:1}
-  .daynav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
-  .daynav button:disabled{opacity:.35;cursor:default}
-  .daylabel{flex:1;text-align:center}
-  .daylabel .dow{font-family:"Fraunces",serif;font-size:20px;font-weight:600;display:block;line-height:1.1}
-  .daylabel .date{font-size:12px;color:var(--muted);letter-spacing:.02em}
+  h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(24px,5.5vw,34px);line-height:1.05;margin:0;letter-spacing:-.01em}
+
+  /* Date toolbar */
+  .toolbar-wrap{display:flex;align-items:stretch;gap:8px;margin:18px 0 10px}
+  .navbtn{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--ink);width:34px;border-radius:10px;font-size:17px;cursor:pointer;display:grid;place-items:center;transition:.15s}
+  .navbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  .navbtn:disabled{opacity:.3;cursor:default}
+  .toolbar{flex:1;display:flex;gap:6px;overflow-x:auto;padding:2px;scrollbar-width:thin}
+  .daybtn{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 10px;cursor:pointer;text-align:center;line-height:1.15;transition:.15s;min-width:52px}
+  .daybtn:hover{border-color:var(--accent)}
+  .daybtn .db-dow{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .daybtn .db-date{display:block;font-size:13px;font-weight:600}
+  .daybtn.active{background:var(--ink);border-color:var(--ink)}
+  .daybtn.active .db-dow,.daybtn.active .db-date{color:#fbfaf6}
+  .daybtn.today:not(.active){box-shadow:inset 0 -2px 0 var(--free)}
+  .toolbar-empty{color:var(--muted);font-size:13px;padding:8px}
+
+  .subnav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .daylabel .dow{font-family:"Fraunces",serif;font-size:19px;font-weight:600}
+  .daylabel .date{font-size:12px;color:var(--muted);letter-spacing:.02em;margin-left:6px}
   .today-pill{display:inline-block;margin-left:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--free-ink);background:var(--free-soft);padding:2px 7px;border-radius:999px;vertical-align:middle;font-weight:600}
+  .todaybtn{border:1px solid var(--line);background:var(--panel);color:var(--accent);font:inherit;font-size:12px;font-weight:600;border-radius:999px;padding:5px 13px;cursor:pointer}
+  .todaybtn:hover{border-color:var(--accent)}
+
+  .tzbar{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:12px;color:var(--free-ink);background:var(--free-soft);border:1px solid #cfe6e0;border-radius:10px;padding:7px 12px}
+  .mutual{margin:0 0 12px;font-size:12.5px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+  .mutual .mlabel{display:inline-block;font-weight:600;color:var(--free-ink);background:var(--free-soft);border-radius:999px;padding:2px 8px;margin-right:8px}
+
   .board{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 14px 18px;overflow:hidden}
   .names{display:grid;grid-template-columns:46px 1fr 1fr;gap:8px;margin-bottom:6px}
-  .names .who{text-align:center;font-weight:600;font-size:14px;padding:6px 0;border-bottom:2px solid var(--ink)}
+  .names .who{text-align:center;font-weight:600;font-size:14px;padding:6px 0 8px;border-bottom:2px solid var(--ink)}
+  .names .who .freesum{display:block;font-weight:500;font-size:11px;color:var(--free-ink);letter-spacing:.01em;margin-top:3px}
   .grid{display:grid;grid-template-columns:46px 1fr 1fr;gap:8px}
   .axis{position:relative}
   .axis .tick{position:absolute;left:0;right:0;font-size:10.5px;color:var(--muted);transform:translateY(-50%);text-align:right;padding-right:6px;letter-spacing:.02em}
@@ -51,6 +70,8 @@
   .block.cust{background:var(--cust);color:var(--cust-ink);box-shadow:inset 3px 0 0 var(--cust-bar)}
   .block .lbl{padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .block.tiny .lbl{display:none}
+  .nowline{position:absolute;left:-2px;right:-2px;height:2px;background:var(--accent);z-index:5}
+  .nowline::before{content:"";position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
   .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--muted)}
   .legend span{display:inline-flex;align-items:center;gap:7px}
   .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
@@ -63,8 +84,9 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(15,122,107,.4)}70%{box-shadow:0 0 0 7px rgba(15,122,107,0)}100%{box-shadow:0 0 0 0 rgba(15,122,107,0)}}
   .dot.stale{background:var(--accent);animation:none}
   .refresh{border:none;background:none;color:var(--accent);cursor:pointer;font:inherit;font-weight:600}
+  .adminlink{text-align:right;margin:10px 0 0;font-size:11px}
+  .adminlink a{color:var(--muted)}
   .banner{margin-top:12px;font-size:12px;color:var(--accent);background:#fbeee6;border:1px solid #f0d6c4;border-radius:10px;padding:8px 12px}
-  .tzbar{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:12px;color:var(--free-ink);background:var(--free-soft);border:1px solid #cfe6e0;border-radius:10px;padding:8px 12px}
   .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
   @media(max-width:480px){
     body{padding:16px 10px 48px}
@@ -76,32 +98,34 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">TEST &middot; SingHealth · NGEMR On-Site</p>
-    <h1>Analyst Availability</h1>
-    <p class="sub">Free/busy for Jacob &amp; Julia on declared on-site days, shown in your local timezone. Customer meetings show a generic label; all other time shows as Busy.</p>
+    <p class="eyebrow" id="eyebrow">SingHealth NGEMR</p>
+    <h1 id="title">Jacob and Julia's Onsite Availability</h1>
   </header>
 
-  <div class="daynav">
-    <button id="prev" aria-label="Previous on-site day">‹</button>
-    <div class="daylabel">
-      <span class="dow" id="dow">—</span>
-      <span class="date" id="date"></span>
-    </div>
-    <button id="next" aria-label="Next on-site day">›</button>
+  <div class="toolbar-wrap">
+    <button id="prev" class="navbtn" aria-label="Previous available day">‹</button>
+    <div class="toolbar" id="toolbar"></div>
+    <button id="next" class="navbtn" aria-label="Next available day">›</button>
+  </div>
+
+  <div class="subnav">
+    <div class="daylabel"><span class="dow" id="dow">—</span><span class="date" id="date"></span></div>
+    <button id="todayBtn" class="todaybtn">Today</button>
   </div>
 
   <div class="tzbar" id="tzbar"></div>
+  <div class="mutual" id="mutual" hidden></div>
 
   <div class="board">
     <div class="names">
       <div></div>
-      <div class="who">Jacob</div>
-      <div class="who">Julia</div>
+      <div class="who" id="who0">—<span class="freesum" id="sum0"></span></div>
+      <div class="who" id="who1">—<span class="freesum" id="sum1"></span></div>
     </div>
     <div class="grid" id="grid">
       <div class="axis" id="axis"></div>
-      <div class="col" id="colJacob"></div>
-      <div class="col" id="colJulia"></div>
+      <div class="col" id="col0"></div>
+      <div class="col" id="col1"></div>
     </div>
     <div class="legend">
       <span><i class="sw free"></i> Free — open for 1:1</span>
@@ -116,28 +140,38 @@
     <span class="synced"><i class="dot" id="dot"></i><span id="syncedTxt">Loading…</span></span>
     <button class="refresh" id="refresh">Refresh now</button>
   </footer>
+  <p class="adminlink"><a href="admin.html">Admin settings</a></p>
 </div>
 
 <script>
 /* ============================================================
-   CONFIG
-   1) DATA_URL — paste your public availability.json URL.
-      Leave "" to preview with sample data.
-   2) DECLARED_DAYS — fallback list of on-site dates (SGT, YYYY-MM-DD)
-      used only if the JSON does not supply its own "days" array.
-      In production the flow/server owns "days" and this is ignored.
+   On-Site Availability viewer.
+   - DATA_URL: public availability.json (leave "" to preview on sample data).
+   - CONFIG_URL: config.json written by admin.html (falls back to defaults).
+   All instants are UTC; rendered in the ANALYST'S own local timezone (a banner states it).
    ============================================================ */
 const DATA_URL = "";
-const DECLARED_DAYS = ["2026-06-03","2026-06-05","2026-06-10","2026-06-12"];
+const CONFIG_URL = "config.json";
 
-const DAY_START=9, DAY_END=18, HOURS=DAY_END-DAY_START, HOUR_PX=56;
+const DEFAULT_CONFIG = {
+  title: "Jacob and Julia's Onsite Availability",
+  eyebrow: "SingHealth NGEMR",
+  viewBack: "0 weeks",        // how far back you may look (floor never earlier than start of current week + this)
+  viewAhead: "4 weeks",       // how far ahead schedules are shown by default
+  weekStartsMonday: true,
+  workStart: 9,
+  workEnd: 18,
+  showNowLine: true,          // current-time line on today
+  showFreeSummary: true,      // per-person "next free / hours open"
+  showMutualFree: true        // "both free" overlap line
+};
+let CONFIG = Object.assign({}, DEFAULT_CONFIG);
+
+let DAY_START=9, DAY_END=18, HOURS=9; const HOUR_PX=56;
 const REFRESH_MS=5*60*1000;
-// Display timezone. Every instant in the JSON is UTC; we ALWAYS render in the analyst's own
-// local timezone (their current location). That's the intended UX — e.g. a remote analyst
-// out sick during on-site week still sees times in their own zone. A banner states this, and
-// we deliberately do NOT override to the customer-site zone.
 let DISPLAY_TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "Asia/Singapore";
 const DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const DOW3=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function zparts(iso){
@@ -145,70 +179,105 @@ function zparts(iso){
   const p=Object.fromEntries(f.formatToParts(new Date(iso)).map(x=>[x.type,x.value]));
   return {date:`${p.year}-${p.month}-${p.day}`, hours:(p.hour==="24"?0:+p.hour)+(+p.minute)/60};
 }
-function sgtKey(iso){ return zparts(iso).date; }       // local day bucket for an instant
-function sgtHour(iso){ return zparts(iso).hours; }     // local fractional hour for an instant
-function todayKeyTZ(){ return zparts(new Date().toISOString()).date; }
+function dayKeyOf(iso){ return zparts(iso).date; }
+function hourOf(iso){ return zparts(iso).hours; }
+function todayKey(){ return zparts(new Date().toISOString()).date; }
+function nowHour(){ return zparts(new Date().toISOString()).hours; }
 function keyOf(d){ return d.toISOString().slice(0,10); }
 function parseKey(s){ const [y,m,d]=s.split("-").map(Number); return new Date(Date.UTC(y,m-1,d)); }
+function addDays(d,n){ return new Date(d.getTime()+n*86400000); }
 
-let DATA=null, DAYS=[], idx=null;
+/* local date + hour -> UTC ISO (for sample data, correct in any viewer tz) */
+function localToUtcISO(dateKey, hour){
+  const [y,m,d]=dateKey.split("-").map(Number);
+  const hh=Math.floor(hour), mm=Math.round((hour-hh)*60);
+  const guess=Date.UTC(y,m-1,d,hh,mm);
+  const f=new Intl.DateTimeFormat("en-US",{timeZone:DISPLAY_TZ,hour12:false,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const p=Object.fromEntries(f.formatToParts(new Date(guess)).map(x=>[x.type,x.value]));
+  const asUTC=Date.UTC(+p.year,+p.month-1,+p.day,p.hour==="24"?0:+p.hour,+p.minute,+p.second);
+  return new Date(guess-(asUTC-guess)).toISOString();
+}
 
-function buildDays(){
-  const list=(DATA && Array.isArray(DATA.days) && DATA.days.length)?DATA.days:DECLARED_DAYS;
-  return [...new Set(list)].sort().map(parseKey);
+function parseRangeDays(s){
+  const m=String(s==null?"":s).trim().match(/(-?\d+(?:\.\d+)?)\s*(w|week|weeks|d|day|days)?/i);
+  if(!m) return 0;
+  let n=parseFloat(m[1]); const u=(m[2]||"day").toLowerCase();
+  if(u[0]==="w") n*=7;
+  return Math.round(n);
+}
+function startOfWeek(d){
+  const dow=d.getUTCDay();              // 0 Sun .. 6 Sat
+  const back=CONFIG.weekStartsMonday ? ((dow+6)%7) : dow;
+  return addDays(d,-back);
+}
+
+let DATA=null, AVAIL=[], idx=0;
+
+/* The viewable window: floor = start of current week (minus configured back-range);
+   ceiling = today + configured ahead-range. No retroactive viewing before the floor. */
+function windowBounds(){
+  const today=parseKey(todayKey());
+  const floor=addDays(startOfWeek(today), -parseRangeDays(CONFIG.viewBack));
+  const ceiling=addDays(today, parseRangeDays(CONFIG.viewAhead));
+  return {floorKey:keyOf(floor), ceilKey:keyOf(ceiling)};
+}
+function computeAvailable(){
+  const {floorKey,ceilKey}=windowBounds();
+  const days=(DATA && Array.isArray(DATA.days)) ? DATA.days : [];
+  AVAIL=[...new Set(days)].filter(d=>d>=floorKey && d<=ceilKey).sort();
 }
 function defaultIndex(){
-  const today=todayKeyTZ();
-  const i=DAYS.findIndex(d=>keyOf(d)>=today);
-  return i<0?Math.max(0,DAYS.length-1):i;
+  const t=todayKey();
+  let i=AVAIL.indexOf(t);
+  if(i>=0) return i;
+  i=AVAIL.findIndex(d=>d>=t);          // nearest upcoming available day
+  return i>=0 ? i : Math.max(0,AVAIL.length-1);
 }
 
+/* ---- sample data: Tue/Thu for this week through +5 weeks, correct in any tz ---- */
 function sampleData(){
-  const days=DECLARED_DAYS;
-  const dk=days[0];
-  const at=(h,m)=>{ const d=parseKey(dk); return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate(),h-8,m||0)).toISOString(); };
-  return {
-    updated:new Date().toISOString(), sample:true, days,
-    people:[
-      {name:"Jacob", busy:[
-        {start:at(9,0),end:at(10,30),label:"SingHealth — OpTime build"},
-        {start:at(13,0),end:at(14,0)},                                  // other domain -> Busy
-        {start:at(15,30),end:at(17,0),label:"Synapxe — integration sync"}
-      ]},
-      {name:"Julia", busy:[
-        {start:at(9,30),end:at(11,0),label:"SingHealth — Anaesthesia"},
-        {start:at(11,30),end:at(12,30)},
-        {start:at(14,0),end:at(16,0),label:"SingHealth — go-live readiness"}
-      ]}
-    ]
-  };
+  const today=parseKey(todayKey());
+  const monday=startOfWeek(today);
+  const days=[];
+  for(let i=0;i<42;i++){ const d=addDays(monday,i); const wd=d.getUTCDay(); if(wd===2||wd===4) days.push(keyOf(d)); }
+  const mk=(dk,h1,m1,h2,m2,label)=>({start:localToUtcISO(dk,h1+ (m1||0)/60),end:localToUtcISO(dk,h2+(m2||0)/60),label});
+  const people=[{name:"Jacob",busy:[]},{name:"Julia",busy:[]}];
+  for(const dk of days){
+    people[0].busy.push(mk(dk,9,0,10,30,"SingHealth — OpTime build"));
+    people[0].busy.push(mk(dk,13,0,14,0,""));                 // other domain -> Busy
+    people[0].busy.push(mk(dk,15,30,17,0,"Synapxe — integration sync"));
+    people[1].busy.push(mk(dk,9,30,11,0,"SingHealth — Anaesthesia"));
+    people[1].busy.push(mk(dk,11,30,12,30,""));
+    people[1].busy.push(mk(dk,14,0,16,0,"SingHealth — go-live readiness"));
+  }
+  return {updated:new Date().toISOString(), sample:true, days, people};
 }
 
+/* ---- per-day block computation ---- */
 function blocksFor(person, dayKey){
-  const items=(person?.busy||[])
-    .filter(b=>sgtKey(b.start)===dayKey)
-    .map(b=>({s:Math.max(DAY_START,sgtHour(b.start)), e:Math.min(DAY_END,sgtHour(b.end)), label:(b.label||"").trim()}))
+  const items=(person&&person.busy||[])
+    .filter(b=>dayKeyOf(b.start)===dayKey)
+    .map(b=>({s:Math.max(DAY_START,hourOf(b.start)), e:Math.min(DAY_END,hourOf(b.end)), label:(b.label||"").trim()}))
     .filter(b=>b.e>b.s)
     .sort((a,b)=>a.s-b.s||a.e-b.e);
   const union=[];
-  for(const b of items){
-    const last=union[union.length-1];
-    if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e});
-  }
+  for(const b of items){ const last=union[union.length-1]; if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e}); }
   const free=[]; let cur=DAY_START;
   for(const b of union){ if(b.s>cur) free.push({s:cur,e:b.s}); cur=Math.max(cur,b.e); }
   if(cur<DAY_END) free.push({s:cur,e:DAY_END});
   return {busy:items, free};
 }
+function clipAfterNow(arr){ const n=nowHour(); return arr.map(b=>({s:Math.max(b.s,n),e:b.e})).filter(b=>b.e>b.s); }
+function intersect(a,b){ const out=[]; let i=0,j=0; while(i<a.length&&j<b.length){ const s=Math.max(a[i].s,b[j].s),e=Math.min(a[i].e,b[j].e); if(e>s) out.push({s,e}); if(a[i].e<b[j].e) i++; else j++; } return out; }
 
 function fmt(h){ const hh=Math.floor(h),mm=Math.round((h-hh)*60),ap=hh>=12?"pm":"am";let h12=hh%12;if(h12===0)h12=12;return mm?`${h12}:${String(mm).padStart(2,"0")}${ap}`:`${h12}${ap}`; }
-function esc(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 function renderAxis(){
   const ax=document.getElementById("axis"); ax.style.height=(HOURS*HOUR_PX)+"px"; ax.innerHTML="";
   for(let h=DAY_START;h<=DAY_END;h++){ const t=document.createElement("div"); t.className="tick"; t.style.top=((h-DAY_START)*HOUR_PX)+"px"; t.textContent=fmt(h); ax.appendChild(t); }
 }
-function renderCol(elId, person, dayKey){
+function renderCol(elId, person, dayKey, isToday){
   const col=document.getElementById(elId);
   col.style.setProperty("--hourpx",HOUR_PX+"px"); col.style.height=(HOURS*HOUR_PX)+"px"; col.innerHTML="";
   if(!person) return;
@@ -217,36 +286,81 @@ function renderCol(elId, person, dayKey){
     const el=document.createElement("div");
     const top=(b.s-DAY_START)*HOUR_PX, h=(b.e-b.s)*HOUR_PX;
     el.className="block "+cls+(h<22?" tiny":"");
-    el.style.top=top+"px"; el.style.height=(h-2)+"px"; el.style.animationDelay=(n++*45)+"ms";
+    el.style.top=top+"px"; el.style.height=(h-2)+"px"; el.style.animationDelay=(n++*40)+"ms";
     el.innerHTML=`<span class="lbl">${esc(text)} · ${fmt(b.s)}–${fmt(b.e)}</span>`;
     col.appendChild(el);
   };
   free.forEach(b=>add(b,"free","Free"));
   busy.forEach(b=>add(b, b.label?"cust":"busy", b.label||"Busy"));
+  if(isToday && CONFIG.showNowLine){
+    const nh=nowHour();
+    if(nh>=DAY_START && nh<=DAY_END){ const ln=document.createElement("div"); ln.className="nowline"; ln.style.top=((nh-DAY_START)*HOUR_PX)+"px"; col.appendChild(ln); }
+  }
+}
+function freeSummary(person, dayKey, isToday){
+  if(!CONFIG.showFreeSummary || !person) return "";
+  let free=blocksFor(person,dayKey).free;
+  if(isToday) free=clipAfterNow(free);
+  if(!free.length) return "No open time";
+  const total=free.reduce((a,b)=>a+(b.e-b.s),0);
+  if(free.length===1 && free[0].s<=DAY_START && free[0].e>=DAY_END) return "Open all day";
+  return `Next free ${fmt(free[0].s)} · ${Math.round(total*10)/10}h open`;
+}
+function renderMutual(p0,p1,dayKey,isToday){
+  const el=document.getElementById("mutual");
+  if(!CONFIG.showMutualFree || !p0 || !p1){ el.hidden=true; return; }
+  let f0=blocksFor(p0,dayKey).free, f1=blocksFor(p1,dayKey).free;
+  if(isToday){ f0=clipAfterNow(f0); f1=clipAfterNow(f1); }
+  const both=intersect(f0,f1);
+  el.hidden=false;
+  el.innerHTML='<span class="mlabel">Both free</span>'+(both.length? both.map(b=>`${fmt(b.s)}–${fmt(b.e)}`).join(' · ') : 'no overlapping open time');
+}
+
+function renderToolbar(){
+  const bar=document.getElementById("toolbar"); bar.innerHTML="";
+  if(!AVAIL.length){ bar.innerHTML='<span class="toolbar-empty">No on-site days in the configured range.</span>'; return; }
+  const t=todayKey();
+  AVAIL.forEach((dk,i)=>{
+    const d=parseKey(dk);
+    const b=document.createElement("button");
+    b.className="daybtn"+(i===idx?" active":"")+(dk===t?" today":"");
+    b.innerHTML=`<span class="db-dow">${DOW3[d.getUTCDay()]}</span><span class="db-date">${d.getUTCDate()} ${MON[d.getUTCMonth()]}</span>`;
+    b.onclick=()=>{ idx=i; renderToolbar(); renderDay(); b.scrollIntoView({inline:"center",block:"nearest"}); };
+    bar.appendChild(b);
+  });
+  const active=bar.querySelector(".daybtn.active"); if(active) active.scrollIntoView({inline:"center",block:"nearest"});
 }
 
 function renderDay(){
   const grid=document.getElementById("grid");
-  // Opt-in gate fallback: if the team hasn't published availability, show a clean message
-  // (never an error). The launch menu should already hide the option in this case.
   if(DATA && DATA.available===false){
     grid.innerHTML=`<div class="empty" style="grid-column:1/-1">Availability isn't published for this team.</div>`;
     document.getElementById("dow").textContent="—"; document.getElementById("date").textContent="";
     document.getElementById("prev").disabled=true; document.getElementById("next").disabled=true;
-    return;
+    document.getElementById("mutual").hidden=true; return;
   }
-  if(!DAYS.length){ grid.innerHTML=`<div class="empty" style="grid-column:1/-1">No on-site days declared yet.</div>`; document.getElementById("dow").textContent="—"; document.getElementById("date").textContent=""; return; }
-  if(idx===null||idx<0||idx>=DAYS.length) idx=defaultIndex();
-  const d=DAYS[idx];
+  if(!AVAIL.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1">No on-site days in the configured range.</div>`;
+    document.getElementById("dow").textContent="—"; document.getElementById("date").textContent="";
+    document.getElementById("prev").disabled=true; document.getElementById("next").disabled=true;
+    document.getElementById("mutual").hidden=true; return;
+  }
+  if(idx<0||idx>=AVAIL.length) idx=defaultIndex();
+  const dk=AVAIL[idx], d=parseKey(dk), isToday=(dk===todayKey());
   document.getElementById("dow").textContent=DOW[d.getUTCDay()];
-  const todayKey=todayKeyTZ();
-  document.getElementById("date").innerHTML=`${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`+(keyOf(d)===todayKey?` <span class="today-pill">Today</span>`:``);
+  document.getElementById("date").innerHTML=`${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`+(isToday?` <span class="today-pill">Today</span>`:``);
   document.getElementById("prev").disabled=idx<=0;
-  document.getElementById("next").disabled=idx>=DAYS.length-1;
-  const dayKey=keyOf(d);
-  const find=n=>DATA?.people?.find(p=>p.name?.toLowerCase().startsWith(n));
-  renderCol("colJacob", find("jacob"), dayKey);
-  renderCol("colJulia", find("julia"), dayKey);
+  document.getElementById("next").disabled=idx>=AVAIL.length-1;
+
+  const people=(DATA&&DATA.people)||[];
+  const p0=people[0], p1=people[1];
+  document.getElementById("who0").childNodes[0].nodeValue = p0? p0.name : "—";
+  document.getElementById("who1").childNodes[0].nodeValue = p1? p1.name : "—";
+  document.getElementById("sum0").textContent = freeSummary(p0,dk,isToday);
+  document.getElementById("sum1").textContent = freeSummary(p1,dk,isToday);
+  renderMutual(p0,p1,dk,isToday);
+  renderCol("col0", p0, dk, isToday);
+  renderCol("col1", p1, dk, isToday);
 }
 
 function relTime(iso){ const s=Math.round((Date.now()-new Date(iso).getTime())/1000); if(s<60)return"just now"; if(s<3600)return Math.floor(s/60)+" min ago"; if(s<86400)return Math.floor(s/3600)+" hr ago"; return Math.floor(s/86400)+" d ago"; }
@@ -256,33 +370,51 @@ function renderStatus(){
   const stale=(Date.now()-new Date(DATA.updated).getTime())>90*60*1000;
   dot.classList.toggle("stale",stale);
   txt.textContent="Calendar synced "+relTime(DATA.updated);
-  if(DATA.sample){ banner.hidden=false; banner.textContent="Preview mode — showing sample times. Paste your availability.json URL into DATA_URL to go live."; } else banner.hidden=true;
+  if(DATA.sample){ banner.hidden=false; banner.textContent="Preview mode — showing sample times. Wire availability.json (and edit config in admin.html) to go live."; } else banner.hidden=true;
+}
+function setTzBar(){ const el=document.getElementById("tzbar"); if(el) el.innerHTML='🕒 Times shown in <strong>your local time</strong> — '+DISPLAY_TZ; }
+
+function applyConfig(){
+  DAY_START=Number(CONFIG.workStart)||9; DAY_END=Number(CONFIG.workEnd)||18;
+  if(DAY_END<=DAY_START) DAY_END=DAY_START+1;
+  HOURS=DAY_END-DAY_START;
+  document.getElementById("title").textContent=CONFIG.title||DEFAULT_CONFIG.title;
+  document.title=CONFIG.title||DEFAULT_CONFIG.title;
+  document.getElementById("eyebrow").textContent=CONFIG.eyebrow||DEFAULT_CONFIG.eyebrow;
 }
 
-function setTzBar(){
-  const el=document.getElementById("tzbar");
-  if(el) el.innerHTML='🕒 Times shown in <strong>your local time</strong> — '+DISPLAY_TZ;
+async function loadConfig(){
+  try{ const r=await fetch(CONFIG_URL,{cache:"no-store"}); if(r.ok){ CONFIG=Object.assign({}, DEFAULT_CONFIG, await r.json()); } }
+  catch(e){ /* defaults */ }
+  applyConfig();
 }
-
 async function load(){
   try{
     if(!DATA_URL){ DATA=sampleData(); }
     else{ const r=await fetch(DATA_URL,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); DATA=await r.json(); }
   }catch(e){
     const banner=document.getElementById("banner"); banner.hidden=false;
-    banner.textContent="Couldn't load availability data ("+e.message+"). Check the DATA_URL and that the link is public.";
+    banner.textContent="Couldn't load availability data ("+e.message+"). Check the data URL and that the link is public.";
     if(!DATA) DATA=sampleData();
   }
-  DAYS=buildDays();
-  renderDay(); renderStatus();
+  computeAvailable();
+  idx=defaultIndex();
+  renderToolbar(); renderDay(); renderStatus();
 }
 
-document.getElementById("prev").onclick=()=>{ if(idx>0){idx--;renderDay();} };
-document.getElementById("next").onclick=()=>{ if(idx<DAYS.length-1){idx++;renderDay();} };
+document.getElementById("prev").onclick=()=>{ if(idx>0){idx--;renderToolbar();renderDay();} };
+document.getElementById("next").onclick=()=>{ if(idx<AVAIL.length-1){idx++;renderToolbar();renderDay();} };
+document.getElementById("todayBtn").onclick=()=>{ idx=defaultIndex(); renderToolbar(); renderDay(); };
 document.getElementById("refresh").onclick=load;
 
-renderAxis(); setTzBar(); load();
-setInterval(load,REFRESH_MS); setInterval(renderStatus,30000);
+(async function init(){
+  await loadConfig();
+  renderAxis(); setTzBar();
+  await load();
+  setInterval(load,REFRESH_MS);
+  setInterval(renderStatus,30000);
+  setInterval(()=>{ if(AVAIL[idx]===todayKey()) renderDay(); },60000); // move the now-line
+})();
 </script>
 </body>
 </html>
