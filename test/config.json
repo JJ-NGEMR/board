@@ -1,12 +1,25 @@
 {
   "title": "Jacob and Julia's Onsite Availability",
   "eyebrow": "TEST · SingHealth NGEMR",
-  "viewBack": "0 weeks",
-  "viewAhead": "4 weeks",
+  "viewBack": 0,
+  "viewAhead": 4,
   "weekStartsMonday": true,
   "workStart": 9,
   "workEnd": 18,
   "showNowLine": true,
   "showFreeSummary": true,
-  "showMutualFree": true
+  "showMutualFree": true,
+  "schedules": [
+    {
+      "dows": [
+        2,
+        4
+      ],
+      "from": "",
+      "to": "",
+      "start": 9,
+      "end": 18
+    }
+  ],
+  "adhoc": []
 }
