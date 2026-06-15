@@ -21,5 +21,13 @@
       "end": 18
     }
   ],
-  "adhoc": []
+  "adhoc": [],
+  "sanitize": {
+    "showTitleDomains": [
+      "synapxe.sg",
+      "singhealth.com.sg"
+    ],
+    "hideDomains": [],
+    "showOrganizer": false
+  }
 }
