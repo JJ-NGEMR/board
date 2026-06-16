@@ -394,21 +394,48 @@ function renderAxis(){
   const ax=document.getElementById("axis"); ax.style.height=(HOURS*HOUR_PX)+"px"; ax.innerHTML="";
   for(let h=DAY_START;h<=DAY_END;h++){ const t=document.createElement("div"); t.className="tick"; t.style.top=((h-DAY_START)*HOUR_PX)+"px"; t.textContent=fmt(h); ax.appendChild(t); }
 }
-function renderCol(elId, person, dayKey, isToday){
+/* Pack overlapping busy blocks into side-by-side lanes (like a calendar app).
+   Each block gets ._col (its lane) and ._cols (lanes in its overlap cluster). */
+function layoutColumns(items){
+  const evs=[...items].sort((a,b)=>a.s-b.s||a.e-b.e);
+  let group=[], gEnd=-Infinity;
+  const flush=(grp)=>{
+    const colEnd=[];           // colEnd[i] = end time of last block placed in lane i
+    grp.forEach(ev=>{
+      let i=0; while(i<colEnd.length && colEnd[i]>ev.s+1e-9) i++;
+      ev._col=i; colEnd[i]=ev.e;
+    });
+    grp.forEach(ev=>ev._cols=colEnd.length);
+  };
+  evs.forEach(ev=>{
+    if(group.length && ev.s>=gEnd-1e-9){ flush(group); group=[]; gEnd=-Infinity; }
+    group.push(ev); gEnd=Math.max(gEnd,ev.e);
+  });
+  if(group.length) flush(group);
+}
+function renderCol(elId, person, dayKey){
   const col=document.getElementById(elId);
   col.style.setProperty("--hourpx",HOUR_PX+"px"); col.style.height=(HOURS*HOUR_PX)+"px"; col.innerHTML="";
   if(!person) return;
-  const {busy,free}=blocksFor(person,dayKey); let n=0;
-  const add=(b,cls,text)=>{
+  const {busy,free}=blocksFor(person,dayKey);
+  layoutColumns(busy);
+  let n=0;
+  const place=(b,cls,text,laned)=>{
     const el=document.createElement("div");
     const top=(b.s-DAY_START)*HOUR_PX, h=(b.e-b.s)*HOUR_PX;
     el.className="block "+cls+(h<22?" tiny":"");
     el.style.top=top+"px"; el.style.height=(h-2)+"px"; el.style.animationDelay=(n++*40)+"ms";
-    el.innerHTML=`<span class="lbl">${esc(text)} · ${fmt(b.s)}–${fmt(b.e)}</span>`;
+    if(laned && b._cols>1){            // concurrent → split into lanes
+      const w=100/b._cols;
+      el.style.left="calc("+(b._col*w)+"% + 3px)";
+      el.style.width="calc("+w+"% - 6px)";
+      el.style.right="auto";
+    }
+    el.innerHTML='<span class="lbl">'+esc(text)+' · '+fmt(b.s)+'–'+fmt(b.e)+'</span>';
     col.appendChild(el);
   };
-  free.forEach(b=>add(b,"free","Free"));
-  busy.forEach(b=>add(b, (b.label?"cust":"busy")+(b.tent?" tent":""), b.label||"Busy"));
+  free.forEach(b=>place(b,"free","Free",false));
+  busy.forEach(b=>place(b,(b.label?"cust":"busy")+(b.tent?" tent":""), b.label||"Busy", true));
 }
 function renderNowLine(isToday){
   const grid=document.getElementById("grid");
