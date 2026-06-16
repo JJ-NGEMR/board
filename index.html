@@ -102,6 +102,7 @@
   .block.free{background:var(--free-soft);color:var(--free-ink);border:1px solid color-mix(in srgb,var(--free) 30%,transparent);box-shadow:inset 3px 0 0 var(--free)}
   .block.busy{background:var(--busy);color:var(--busy-ink);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 6px,transparent 6px 12px)}
   .block.cust{background:var(--cust);color:var(--cust-ink);box-shadow:inset 3px 0 0 var(--cust-bar)}
+  .block.tent{border:1.5px dashed currentColor;background-image:repeating-linear-gradient(45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px), repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px)}
   .block .lbl{padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .block.tiny .lbl{display:none}
   .nowline{position:absolute;left:-2px;right:-2px;height:2px;background:var(--accent);z-index:5}
@@ -116,6 +117,7 @@
   .sw.free{background:var(--free-soft);box-shadow:inset 3px 0 0 var(--free)}
   .sw.cust{background:var(--cust);box-shadow:inset 3px 0 0 var(--cust-bar)}
   .sw.busy{background:var(--busy);background-image:repeating-linear-gradient(45deg,rgba(125,125,125,.25) 0 4px,transparent 4px 8px)}
+  .sw.tent{border:1px dashed var(--muted);background-image:repeating-linear-gradient(45deg,var(--line) 0 3px,transparent 3px 6px),repeating-linear-gradient(-45deg,var(--line) 0 3px,transparent 3px 6px)}
   footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;font-size:12px;color:var(--muted);flex-wrap:wrap}
   .synced{display:inline-flex;align-items:center;gap:7px}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--free);animation:pulse 2.4s infinite}
@@ -240,6 +242,7 @@
       <span><i class="sw free"></i> Free — open for 1:1</span>
       <span><i class="sw cust"></i> Customer meeting</span>
       <span><i class="sw busy"></i> Busy</span>
+      <span><i class="sw tent"></i> Tentative (not yet accepted)</span>
     </div>
   </div>
 
@@ -373,7 +376,7 @@ function sampleData(){
 function blocksFor(person, dayKey){
   const items=(person&&person.busy||[])
     .filter(b=>dayKeyOf(b.start)===dayKey)
-    .map(b=>({s:Math.max(DAY_START,hourOf(b.start)), e:Math.min(DAY_END,hourOf(b.end)), label:(b.label||"").trim()}))
+    .map(b=>({s:Math.max(DAY_START,hourOf(b.start)), e:Math.min(DAY_END,hourOf(b.end)), label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim()}))
     .filter(b=>b.e>b.s).sort((a,b)=>a.s-b.s||a.e-b.e);
   const union=[];
   for(const b of items){ const last=union[union.length-1]; if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e}); }
@@ -405,7 +408,7 @@ function renderCol(elId, person, dayKey, isToday){
     col.appendChild(el);
   };
   free.forEach(b=>add(b,"free","Free"));
-  busy.forEach(b=>add(b, b.label?"cust":"busy", b.label||"Busy"));
+  busy.forEach(b=>add(b, (b.label?"cust":"busy")+(b.tent?" tent":""), b.label||"Busy"));
 }
 function renderNowLine(isToday){
   const grid=document.getElementById("grid");
