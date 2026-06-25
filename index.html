@@ -103,7 +103,8 @@
   .block.busy{background:var(--busy);color:var(--busy-ink);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 6px,transparent 6px 12px)}
   .block.cust{background:var(--cust);color:var(--cust-ink);box-shadow:inset 3px 0 0 var(--cust-bar)}
   .block.tent{border:1.5px dashed currentColor;background-image:repeating-linear-gradient(45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px), repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px)}
-  .block .lbl{padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .block .lbl{padding:2px 6px;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;text-align:center;line-height:1.22}
+  .block .lbl-loc{display:block;font-weight:400;font-size:.92em;opacity:.82;margin-top:2px}
   .block.tiny .lbl{display:none}
   .nowline{position:absolute;left:-2px;right:-2px;height:2px;background:var(--accent);z-index:5}
   .nowline::before{content:"";position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
@@ -376,7 +377,7 @@ function sampleData(){
 function blocksFor(person, dayKey){
   const items=(person&&person.busy||[])
     .filter(b=>dayKeyOf(b.start)===dayKey)
-    .map(b=>({s:Math.max(DAY_START,hourOf(b.start)), e:Math.min(DAY_END,hourOf(b.end)), label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim()}))
+    .map(b=>({s:Math.max(DAY_START,hourOf(b.start)), e:Math.min(DAY_END,hourOf(b.end)), label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim(), loc:(b.location||"").trim()}))
     .filter(b=>b.e>b.s).sort((a,b)=>a.s-b.s||a.e-b.e);
   const union=[];
   for(const b of items){ const last=union[union.length-1]; if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e}); }
@@ -431,7 +432,10 @@ function renderCol(elId, person, dayKey){
       el.style.width="calc("+w+"% - 6px)";
       el.style.right="auto";
     }
-    el.innerHTML='<span class="lbl">'+esc(text)+' · '+fmt(b.s)+'–'+fmt(b.e)+'</span>';
+    let html='<span class="lbl">'+esc(text)+' · '+fmt(b.s)+'–'+fmt(b.e);
+    if(b.loc && cls.indexOf("cust")!==-1) html+='<span class="lbl-loc">'+esc(b.loc)+'</span>';  // location only on visible (customer-labeled) events
+    html+='</span>';
+    el.innerHTML=html;
     col.appendChild(el);
   };
   free.forEach(b=>place(b,"free","Free",false));
