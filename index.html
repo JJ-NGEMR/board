@@ -16,6 +16,7 @@
     --panel:#fbfaf6; --ink:#1d1c1a; --muted:#6f6a60; --line:#e2ddd1;
     --busy:#d9d3c6; --busy-ink:#7c7466;
     --cust:#dfe8d6; --cust-ink:#4f6b3a; --cust-bar:#6f9148;
+    --ooo:#dde3ea; --ooo-ink:#46586a; --ooo-bar:#6b8299;
     --free:#0f7a6b; --free-soft:#e3f1ee; --free-ink:#0a5a4f;
     --accent:#c2683a; --gold:#c79a3e;
     --deco:#0f7a6b; --deco2:#c2683a;
@@ -27,6 +28,7 @@
     --panel:#181c28; --ink:#ece8db; --muted:#9a958a; --line:#2a3040;
     --busy:#2b3142; --busy-ink:#aaa496;
     --cust:#20331e; --cust-ink:#c4e3aa; --cust-bar:#7aa256;
+    --ooo:#222c39; --ooo-ink:#b9c7d6; --ooo-bar:#6b8299;
     --free:#3acab2; --free-soft:#12302b; --free-ink:#83ead6;
     --accent:#ec9a5c; --gold:#e6c873;
     --deco:#3acab2; --deco2:#ec9a5c;
@@ -102,6 +104,7 @@
   .block.free{background:var(--free-soft);color:var(--free-ink);border:1px solid color-mix(in srgb,var(--free) 30%,transparent);box-shadow:inset 3px 0 0 var(--free)}
   .block.busy{background:var(--busy);color:var(--busy-ink);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 6px,transparent 6px 12px)}
   .block.cust{background:var(--cust);color:var(--cust-ink);box-shadow:inset 3px 0 0 var(--cust-bar)}
+  .block.ooo{background:var(--ooo);color:var(--ooo-ink);box-shadow:inset 3px 0 0 var(--ooo-bar);background-image:repeating-linear-gradient(45deg,color-mix(in srgb,var(--ooo-bar) 16%,transparent) 0 6px,transparent 6px 12px)}
   .block.tent{border:1.5px dashed currentColor;background-image:repeating-linear-gradient(45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px), repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px)}
   .block .lbl{padding:2px 6px;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;text-align:center;line-height:1.22}
   .block .lbl-loc{display:block;font-weight:400;font-size:.92em;opacity:.82;margin-top:2px}
@@ -117,6 +120,7 @@
   .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
   .sw.free{background:var(--free-soft);box-shadow:inset 3px 0 0 var(--free)}
   .sw.cust{background:var(--cust);box-shadow:inset 3px 0 0 var(--cust-bar)}
+  .sw.ooo{background:var(--ooo);box-shadow:inset 3px 0 0 var(--ooo-bar)}
   .sw.busy{background:var(--busy);background-image:repeating-linear-gradient(45deg,rgba(125,125,125,.25) 0 4px,transparent 4px 8px)}
   .sw.tent{border:1px dashed var(--muted);background-image:repeating-linear-gradient(45deg,var(--line) 0 3px,transparent 3px 6px),repeating-linear-gradient(-45deg,var(--line) 0 3px,transparent 3px 6px)}
   footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;font-size:12px;color:var(--muted);flex-wrap:wrap}
@@ -242,6 +246,7 @@
     <div class="legend">
       <span><i class="sw free"></i> Free — open for 1:1</span>
       <span><i class="sw cust"></i> Customer meeting</span>
+      <span><i class="sw ooo"></i> On leave</span>
       <span><i class="sw busy"></i> Busy</span>
       <span><i class="sw tent"></i> Tentative (not yet accepted)</span>
     </div>
@@ -371,14 +376,31 @@ function sampleData(){
     people[0].busy.push(mk(dk,9,10.5,"SingHealth — OpTime build"),mk(dk,13,14,""),mk(dk,15.5,17,"Synapxe — integration sync"));
     people[1].busy.push(mk(dk,9.5,11,"SingHealth — Anaesthesia"),mk(dk,11.5,12.5,""),mk(dk,14,16,"SingHealth — go-live readiness"));
   }
+  if(days.length){                                  // demo leave: half-day sick (timed) + full-day vacation (all-day)
+    const a=days[0], b=days[1]||days[0];
+    people[1].busy.push({start:localToUtcISO(a,8), end:localToUtcISO(a,12), label:"", kind:"leave", allday:""});
+    people[0].busy.push({start:b+"T00:00:00Z", end:keyOf(addDays(parseKey(b),1))+"T00:00:00Z", label:"", kind:"leave", allday:"1"});
+  }
   return {updated:new Date().toISOString(), sample:true, days, people};
 }
 
 function blocksFor(person, dayKey){
-  const items=(person&&person.busy||[])
-    .filter(b=>dayKeyOf(b.start)===dayKey)
-    .map(b=>({s:Math.max(DAY_START,hourOf(b.start)), e:Math.min(DAY_END,hourOf(b.end)), label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim(), loc:(b.location||"").trim()}))
-    .filter(b=>b.e>b.s).sort((a,b)=>a.s-b.s||a.e-b.e);
+  const items=[];
+  for(const b of ((person&&person.busy)||[])){
+    const leave=String(b.kind||"")==="leave";
+    if(leave && String(b.allday||"").trim()){
+      // full-day sick/vacation arrives as an all-day event → block the whole work window on every date it covers
+      // (all-day end is the exclusive next-midnight; compare on the raw date so multi-day vacations and tz don't shift it)
+      if(dayKey>=String(b.start).slice(0,10) && dayKey<String(b.end).slice(0,10))
+        items.push({s:DAY_START, e:DAY_END, label:"", tent:false, loc:"", leave:true});
+      continue;
+    }
+    if(dayKeyOf(b.start)!==dayKey) continue;
+    const s=Math.max(DAY_START,hourOf(b.start)), e=Math.min(DAY_END,hourOf(b.end));
+    if(e<=s) continue;                                  // half-day leave (timed) renders as-is, just clipped to the work window
+    items.push({s, e, label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim(), loc:(b.location||"").trim(), leave});
+  }
+  items.sort((a,b)=>a.s-b.s||a.e-b.e);
   const union=[];
   for(const b of items){ const last=union[union.length-1]; if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e}); }
   const free=[]; let cur=DAY_START;
@@ -439,7 +461,10 @@ function renderCol(elId, person, dayKey){
     col.appendChild(el);
   };
   free.forEach(b=>place(b,"free","Free",false));
-  busy.forEach(b=>place(b,(b.label?"cust":"busy")+(b.tent?" tent":""), b.label||"Busy", true));
+  busy.forEach(b=>{
+    const cls = b.leave ? "ooo" : ((b.label?"cust":"busy")+(b.tent?" tent":""));
+    place(b, cls, b.leave ? "On leave" : (b.label||"Busy"), true);
+  });
 }
 function renderNowLine(isToday){
   const grid=document.getElementById("grid");
