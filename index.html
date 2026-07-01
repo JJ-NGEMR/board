@@ -415,7 +415,11 @@ function blocksFor(person, dayKey){
   const free=[]; let cur=DAY_START;
   for(const b of union){ if(b.s>cur) free.push({s:cur,e:b.s}); cur=Math.max(cur,b.e); }
   if(cur<DAY_END) free.push({s:cur,e:DAY_END});
-  return {busy:items, free};
+  // leave owns its timeslot: hide any other event overlapping an "On leave" interval (free/mutual math above still
+  // uses the full list, so overlapped time stays correctly busy — it just isn't drawn next to the leave block)
+  const leaveIv=items.filter(b=>b.leave);
+  const busy=leaveIv.length ? items.filter(b=>b.leave || !leaveIv.some(L=>b.s<L.e-1e-9 && b.e>L.s+1e-9)) : items;
+  return {busy, free};
 }
 function clipAfterNow(arr){ const n=nowHour(); return arr.map(b=>({s:Math.max(b.s,n),e:b.e})).filter(b=>b.e>b.s); }
 function intersect(a,b){ const out=[];let i=0,j=0; while(i<a.length&&j<b.length){const s=Math.max(a[i].s,b[j].s),e=Math.min(a[i].e,b[j].e);if(e>s)out.push({s,e});if(a[i].e<b[j].e)i++;else j++;} return out; }
