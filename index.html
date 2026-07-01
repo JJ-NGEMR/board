@@ -432,7 +432,9 @@ function layoutColumns(items){
   let group=[], gEnd=-Infinity;
   const flush=(grp)=>{
     const colEnd=[];           // colEnd[i] = end time of last block placed in lane i
-    grp.forEach(ev=>{
+    // place leave ("On leave") first so it claims the far-left lane; a full-day hold spans the whole
+    // day, so nothing else can share that lane — keeping leave pinned to the left of the column
+    [...grp].sort((a,b)=>(b.leave?1:0)-(a.leave?1:0)||a.s-b.s||a.e-b.e).forEach(ev=>{
       let i=0; while(i<colEnd.length && colEnd[i]>ev.s+1e-9) i++;
       ev._col=i; colEnd[i]=ev.e;
     });
