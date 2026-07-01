@@ -390,16 +390,22 @@ function blocksFor(person, dayKey){
   const items=[];
   for(const b of ((person&&person.busy)||[])){
     const leave=String(b.kind||"")==="leave";
-    if(leave && String(b.allday||"").trim()){
-      // full-day sick/vacation arrives as an all-day event → block the whole work window on every date it covers
-      // (all-day end is the exclusive next-midnight; compare on the raw date so multi-day vacations and tz don't shift it)
-      if(dayKey>=String(b.start).slice(0,10) && dayKey<String(b.end).slice(0,10))
-        items.push({s:DAY_START, e:DAY_END, label:"", tent:false, loc:"", leave:true});
+    if(leave){
+      // Sick/vacation may be a same-day half-day block OR span several days. Guru sends these as timed
+      // UTC instants (a full-day hold is midnight→midnight in local time, isAllDay stays false), so clip
+      // per day in the viewer's timezone: middle days fill the whole work window, boundary days use the
+      // event's actual hours. This makes multi-day vacations show on every covered on-site day.
+      const sd=dayKeyOf(b.start), ed=dayKeyOf(b.end);
+      if(dayKey<sd || dayKey>ed) continue;
+      const s=Math.max(DAY_START, dayKey===sd?hourOf(b.start):DAY_START);
+      const e=Math.min(DAY_END,   dayKey===ed?hourOf(b.end):DAY_END);
+      if(e<=s) continue;
+      items.push({s, e, label:"", tent:false, loc:"", leave:true});
       continue;
     }
     if(dayKeyOf(b.start)!==dayKey) continue;
     const s=Math.max(DAY_START,hourOf(b.start)), e=Math.min(DAY_END,hourOf(b.end));
-    if(e<=s) continue;                                  // half-day leave (timed) renders as-is, just clipped to the work window
+    if(e<=s) continue;
     items.push({s, e, label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim(), loc:(b.location||"").trim(), leave});
   }
   items.sort((a,b)=>a.s-b.s||a.e-b.e);
