@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Staff Admin · Onsite Availability</title>
+<script>(function(){try{var t=localStorage.getItem('osa-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--panel:#fbfaf6;--ink:#1d1c1a;--muted:#6f6a60;--line:#e2ddd1;--accent:#c2683a;--free:#0f7a6b;--free-soft:#e3f1ee;--free-ink:#0a5a4f;--warn:#b4472b;--warn-soft:#fbeee6;--shadow:0 1px 2px rgba(40,35,25,.06),0 8px 24px rgba(40,35,25,.06)}
+  [data-theme="dark"]{--bg:#11141d;--panel:#181c28;--ink:#ece8db;--muted:#9a958a;--line:#2a3040;--accent:#ec9a5c;--free:#3acab2;--free-soft:#12302b;--free-ink:#83ead6;--warn:#ec9a5c;--warn-soft:#2a2016;--shadow:0 1px 2px rgba(0,0,0,.45),0 12px 34px rgba(0,0,0,.5)}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:24px 16px 56px}
+  .wrap{max-width:760px;margin:0 auto}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 6px}
+  h1{font-family:"Fraunces",serif;font-weight:600;font-size:30px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  .notice{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);color:var(--warn);border-radius:11px;padding:11px 14px;font-size:12.5px;line-height:1.5;margin-bottom:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 14px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+  .field .hint{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+  .field input[type=text],.field input[type=number],.field input[type=date],.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;background:var(--bg);color:var(--ink)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}.row .field{flex:1;min-width:120px}
+  .numwrap{display:flex;align-items:center;gap:8px}
+  .numwrap input{width:90px!important}.numwrap .unit{color:var(--muted);font-size:13px}
+  .toggle{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}.toggle input{margin-top:3px}
+  .t-label{font-size:13px;font-weight:600}.t-desc{font-size:12px;color:var(--muted)}
+  .rule{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:12px;background:var(--bg)}
+  .dows{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+  .dow{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 9px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+  .dow.on{background:var(--free);border-color:var(--free);color:#fff}
+  .rule .row{align-items:flex-end}
+  .rmrow{border:none;background:none;color:var(--warn);cursor:pointer;font:inherit;font-weight:600;font-size:12px;padding:4px 0}
+  .addbtn{border:1px dashed var(--line);background:none;color:var(--accent);font:inherit;font-weight:600;border-radius:10px;padding:9px 14px;cursor:pointer;width:100%}
+  .addbtn:hover{border-color:var(--accent)}
+  pre{background:#13161d;color:#e9e4d8;border-radius:11px;padding:14px;overflow:auto;font-size:12px;line-height:1.5;margin:0;max-height:280px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button.act{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:600;border-radius:10px;padding:9px 16px;cursor:pointer}
+  button.primary{background:var(--free);border-color:var(--free);color:#fff}
+  button.act:hover{border-color:var(--accent)}
+  .ok{color:var(--free-ink);font-size:12.5px;margin-left:8px}
+  .steps{font-size:12.5px;color:var(--muted);line-height:1.6;margin:10px 0 0;padding-left:18px}
+  code{background:color-mix(in srgb,var(--accent) 14%,var(--panel));border-radius:4px;padding:1px 5px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Onsite Availability · Staff</p>
+  <h1>Staff admin</h1>
+  <p class="sub">Set what analysts can see, then download <code>config.json</code> and commit it to the repo.</p>
+
+  <div class="notice"><strong>Staff only.</strong> This page is reachable from the board only after unlocking the hidden staff link (passphrase), and it's kept out of sight for analysts. It's harmless either way: it only builds a <code>config.json</code>; the live board changes only when that file is committed to the repository (which requires repo access analysts don't have). Real page-level access control arrives with the UserWeb version.</div>
+
+  <div class="card">
+    <h2>Display</h2>
+    <div class="field"><label>Title</label><input type="text" id="title"></div>
+    <div class="field"><label>Header text <span class="hint">(small label above the title)</span></label><input type="text" id="eyebrow"></div>
+  </div>
+
+  <div class="card">
+    <h2>Meeting privacy</h2>
+    <p class="hint" style="display:block;margin:-6px 0 12px"><strong>By default, every calendar event is hidden</strong> — analysts see only "Busy." List the domains below whose meetings may reveal their title (and optionally organizer); everything else stays hidden. These rules are applied in the data pipeline before anything reaches the public board.</p>
+    <div class="field"><label>Show meeting titles for these domains <span class="hint">comma-separated</span></label>
+      <input type="text" id="showTitleDomains" placeholder="e.g. synapxe.sg, singhealth.com.sg">
+      <div class="hint">Add your customer / analyst domains — meetings sent by these reveal their title to analysts.</div></div>
+    <label class="toggle"><input type="checkbox" id="showOrganizer"><span><span class="t-label">Also show the meeting organizer</span><br><span class="t-desc">For the domains above, include who organized the meeting.</span></span></label>
+    <div class="field"><label>Always hide these domains <span class="hint">optional, comma-separated</span></label>
+      <input type="text" id="hideDomains" placeholder="(optional)">
+      <div class="hint">Explicitly hidden even if they'd otherwise match.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Viewable date range</h2>
+    <div class="row">
+      <div class="field"><label>Look-back</label><div class="numwrap"><input type="number" id="viewBack" min="0" step="1"><span class="unit">weeks</span></div>
+        <div class="hint">Floor = start of the current week + this. 0 = current week is the earliest viewable.</div></div>
+      <div class="field"><label>Look-ahead</label><div class="numwrap"><input type="number" id="viewAhead" min="0" step="1"><span class="unit">weeks</span></div>
+        <div class="hint">How far ahead schedules show, from today.</div></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Week starts on</label><select id="weekStartsMonday"><option value="true">Monday</option><option value="false">Sunday</option></select></div>
+      <div class="field"><label>Default hours start <span class="hint">24h</span></label><input type="number" id="workStart" min="0" max="23"></div>
+      <div class="field"><label>Default hours end <span class="hint">24h</span></label><input type="number" id="workEnd" min="1" max="24"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Recurring schedules</h2>
+    <p class="hint" style="display:block;margin:-6px 0 12px">Pick weekdays to make visible (including <strong>Sat/Sun</strong> for weekend initiatives), a date range, and the hour window analysts see for those days. Add as many rows as you need.</p>
+    <div id="schedules"></div>
+    <button class="addbtn" id="addSchedule">+ Add recurring schedule</button>
+  </div>
+
+  <div class="card">
+    <h2>Ad-hoc dates</h2>
+    <p class="hint" style="display:block;margin:-6px 0 12px">One-off dates or short ranges, each with their own hour window. These override recurring schedules.</p>
+    <div id="adhoc"></div>
+    <button class="addbtn" id="addAdhoc">+ Add ad-hoc date / range</button>
+  </div>
+
+  <div class="card">
+    <h2>Analyst features</h2>
+    <label class="toggle"><input type="checkbox" id="showNowLine"><span><span class="t-label">Current-time line</span><br><span class="t-desc">Marker on today's column showing "now."</span></span></label>
+    <label class="toggle"><input type="checkbox" id="showFreeSummary"><span><span class="t-label">Next-free / hours-open summary</span><br><span class="t-desc">Under each name: next open slot and total open hours.</span></span></label>
+    <label class="toggle"><input type="checkbox" id="showMutualFree"><span><span class="t-label">"Both free" overlap line</span><br><span class="t-desc">Windows where both staff are open — for a joint 1:1.</span></span></label>
+  </div>
+
+  <div class="card">
+    <h2>config.json</h2>
+    <pre id="preview"></pre>
+    <div class="actions">
+      <button class="act primary" id="download">Download config.json</button>
+      <button class="act" id="copy">Copy</button>
+      <span class="ok" id="okmsg"></span>
+    </div>
+    <ol class="steps">
+      <li>Click <strong>Download config.json</strong>.</li>
+      <li>Commit it to the repo <strong>root</strong> (production) — or into <code>test/</code> to try on the test site first.</li>
+      <li>Pages redeploys in ~1 min; refresh the board.</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+const DOWS=[["Mon",1],["Tue",2],["Wed",3],["Thu",4],["Fri",5],["Sat",6],["Sun",0]];
+const DEFAULT_CONFIG={title:"Jacob and Julia's Onsite Availability",eyebrow:"SingHealth NGEMR",viewBack:0,viewAhead:4,weekStartsMonday:true,workStart:9,workEnd:18,showNowLine:true,showFreeSummary:true,showMutualFree:true,schedules:[{dows:[2,4],from:"",to:"",start:9,end:18}],adhoc:[],sanitize:{showTitleDomains:[],hideDomains:[],showOrganizer:false}};
+
+function val(id){return document.getElementById(id).value;}
+function chk(id){return document.getElementById(id).checked;}
+function parseDomains(s){return String(s||"").split(/[\s,;]+/).map(x=>x.trim().toLowerCase()).filter(Boolean);}
+function joinDomains(a){return (a||[]).join(", ");}
+
+/* ---- dynamic rows ---- */
+function scheduleRow(r){
+  r=r||{dows:[],from:"",to:"",start:9,end:18};
+  const wrap=document.createElement("div"); wrap.className="rule";
+  const dows=document.createElement("div"); dows.className="dows";
+  DOWS.forEach(([lbl,n])=>{ const b=document.createElement("button"); b.type="button"; b.className="dow"+((r.dows||[]).includes(n)?" on":""); b.textContent=lbl; b.dataset.dow=n; b.onclick=()=>{b.classList.toggle("on");refresh();}; dows.appendChild(b); });
+  wrap.appendChild(dows);
+  wrap.insertAdjacentHTML("beforeend",
+    '<div class="row">'+
+      '<div class="field"><label>From <span class="hint">optional</span></label><input type="date" class="f-from"></div>'+
+      '<div class="field"><label>To <span class="hint">optional</span></label><input type="date" class="f-to"></div>'+
+      '<div class="field"><label>Hours start</label><input type="number" class="f-start" min="0" max="23"></div>'+
+      '<div class="field"><label>Hours end</label><input type="number" class="f-end" min="1" max="24"></div>'+
+    '</div><button type="button" class="rmrow">Remove</button>');
+  wrap.querySelector(".f-from").value=r.from||""; wrap.querySelector(".f-to").value=r.to||"";
+  wrap.querySelector(".f-start").value=(r.start!=null?r.start:9); wrap.querySelector(".f-end").value=(r.end!=null?r.end:18);
+  wrap.querySelectorAll("input").forEach(i=>{i.addEventListener("input",refresh);i.addEventListener("change",refresh);});
+  wrap.querySelector(".rmrow").onclick=()=>{wrap.remove();refresh();};
+  return wrap;
+}
+function adhocRow(r){
+  r=r||{from:"",to:"",start:9,end:18};
+  const wrap=document.createElement("div"); wrap.className="rule";
+  wrap.insertAdjacentHTML("beforeend",
+    '<div class="row">'+
+      '<div class="field"><label>From</label><input type="date" class="f-from"></div>'+
+      '<div class="field"><label>To <span class="hint">blank = same day</span></label><input type="date" class="f-to"></div>'+
+      '<div class="field"><label>Hours start</label><input type="number" class="f-start" min="0" max="23"></div>'+
+      '<div class="field"><label>Hours end</label><input type="number" class="f-end" min="1" max="24"></div>'+
+    '</div><button type="button" class="rmrow">Remove</button>');
+  wrap.querySelector(".f-from").value=r.from||""; wrap.querySelector(".f-to").value=r.to||"";
+  wrap.querySelector(".f-start").value=(r.start!=null?r.start:9); wrap.querySelector(".f-end").value=(r.end!=null?r.end:18);
+  wrap.querySelectorAll("input").forEach(i=>{i.addEventListener("input",refresh);i.addEventListener("change",refresh);});
+  wrap.querySelector(".rmrow").onclick=()=>{wrap.remove();refresh();};
+  return wrap;
+}
+function readSchedules(){
+  return [...document.querySelectorAll("#schedules .rule")].map(w=>({
+    dows:[...w.querySelectorAll(".dow.on")].map(b=>Number(b.dataset.dow)).sort(),
+    from:w.querySelector(".f-from").value, to:w.querySelector(".f-to").value,
+    start:Number(w.querySelector(".f-start").value), end:Number(w.querySelector(".f-end").value)
+  })).filter(r=>r.dows.length);
+}
+function readAdhoc(){
+  return [...document.querySelectorAll("#adhoc .rule")].map(w=>{
+    const from=w.querySelector(".f-from").value;
+    return {from:from, to:(w.querySelector(".f-to").value||from), start:Number(w.querySelector(".f-start").value), end:Number(w.querySelector(".f-end").value)};
+  }).filter(r=>r.from);
+}
+function readForm(){
+  return {
+    title:val("title"), eyebrow:val("eyebrow"),
+    viewBack:Number(val("viewBack"))||0, viewAhead:Number(val("viewAhead"))||0,
+    weekStartsMonday:val("weekStartsMonday")==="true",
+    workStart:Number(val("workStart")), workEnd:Number(val("workEnd")),
+    showNowLine:chk("showNowLine"), showFreeSummary:chk("showFreeSummary"), showMutualFree:chk("showMutualFree"),
+    schedules:readSchedules(), adhoc:readAdhoc(),
+    sanitize:{ showTitleDomains:parseDomains(val("showTitleDomains")), hideDomains:parseDomains(val("hideDomains")), showOrganizer:chk("showOrganizer") }
+  };
+}
+function refresh(){ document.getElementById("preview").textContent=JSON.stringify(readForm(),null,2); }
+
+function writeForm(c){
+  document.getElementById("title").value=c.title;
+  document.getElementById("eyebrow").value=c.eyebrow;
+  document.getElementById("viewBack").value=parseInt(c.viewBack,10)||0;
+  document.getElementById("viewAhead").value=parseInt(c.viewAhead,10)||0;
+  document.getElementById("weekStartsMonday").value=String(c.weekStartsMonday!==false);
+  document.getElementById("workStart").value=c.workStart;
+  document.getElementById("workEnd").value=c.workEnd;
+  document.getElementById("showNowLine").checked=c.showNowLine!==false;
+  document.getElementById("showFreeSummary").checked=c.showFreeSummary!==false;
+  document.getElementById("showMutualFree").checked=c.showMutualFree!==false;
+  const san=c.sanitize||{};
+  document.getElementById("showTitleDomains").value=joinDomains(san.showTitleDomains);
+  document.getElementById("hideDomains").value=joinDomains(san.hideDomains);
+  document.getElementById("showOrganizer").checked=san.showOrganizer===true;
+  const sc=document.getElementById("schedules"); sc.innerHTML=""; (c.schedules||[]).forEach(r=>sc.appendChild(scheduleRow(r)));
+  const ah=document.getElementById("adhoc"); ah.innerHTML=""; (c.adhoc||[]).forEach(r=>ah.appendChild(adhocRow(r)));
+}
+
+document.getElementById("addSchedule").onclick=()=>{ document.getElementById("schedules").appendChild(scheduleRow()); refresh(); };
+document.getElementById("addAdhoc").onclick=()=>{ document.getElementById("adhoc").appendChild(adhocRow()); refresh(); };
+["title","eyebrow","viewBack","viewAhead","weekStartsMonday","workStart","workEnd","showNowLine","showFreeSummary","showMutualFree","showTitleDomains","hideDomains","showOrganizer"].forEach(id=>{const el=document.getElementById(id);el.addEventListener("input",refresh);el.addEventListener("change",refresh);});
+
+document.getElementById("download").onclick=()=>{
+  const blob=new Blob([JSON.stringify(readForm(),null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="config.json"; a.click(); URL.revokeObjectURL(a.href); flash("Downloaded.");
+};
+document.getElementById("copy").onclick=async()=>{ try{await navigator.clipboard.writeText(JSON.stringify(readForm(),null,2));flash("Copied.");}catch(e){flash("Copy failed — select manually.");} };
+function flash(m){const el=document.getElementById("okmsg");el.textContent=m;setTimeout(()=>el.textContent="",2500);}
+
+(async function(){
+  let c=Object.assign({},DEFAULT_CONFIG);
+  try{ const r=await fetch("config.json",{cache:"no-store"}); if(r.ok) c=Object.assign({},DEFAULT_CONFIG,await r.json()); }catch(e){}
+  writeForm(c); refresh();
+})();
+</script>
+</body>
+</html>

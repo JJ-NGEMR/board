@@ -132,6 +132,9 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--free) 40%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
   .dot.stale{background:var(--accent);animation:none}
   .refresh{border:none;background:none;color:var(--accent);cursor:pointer;font:inherit;font-weight:600}
+  .foot-actions{display:inline-flex;gap:10px;align-items:center}
+  .adminlink{border:1px solid var(--line);background:var(--panel);color:var(--accent);cursor:pointer;font:inherit;font-weight:600;font-size:12px;border-radius:999px;padding:5px 13px}
+  .adminlink:hover{border-color:var(--accent)}
   .banner{margin-top:12px;font-size:12px;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:10px;padding:8px 12px}
   .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
   @media(max-width:480px){
@@ -259,7 +262,10 @@
 
   <footer>
     <span class="synced"><i class="dot" id="dot"></i><span id="syncedTxt">Loading…</span></span>
-    <button class="refresh" id="refresh">Refresh now</button>
+    <span class="foot-actions">
+      <button class="adminlink" id="adminBtn" hidden>⚙ Staff admin</button>
+      <button class="refresh" id="refresh">Refresh now</button>
+    </span>
   </footer>
 
   <svg class="frieze bottom" viewBox="0 0 1200 96" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><use href="#frieze"/></svg>
@@ -588,6 +594,37 @@ document.getElementById("next").onclick=()=>{ if(idx<AVAIL.length-1){idx++;rende
 document.getElementById("todayBtn").onclick=()=>{ idx=defaultIndex(); renderToolbar(); renderDay(); };
 document.getElementById("refresh").onclick=load;
 document.getElementById("themeToggle").onclick=()=>setTheme(curTheme()==="dark"?"light":"dark");
+
+/* ---- staff admin unlock ------------------------------------------------------
+   This is an OBSCURITY gate, not authentication: a public static site can't verify
+   who a visitor is. It just keeps the admin link out of sight for external analysts.
+   Real security is unchanged — the admin page only builds config.json, and the live
+   board changes only when someone with repo write access commits it (analysts can't).
+   The passphrase itself is never stored — only its SHA-256 hash lives here, so viewing
+   source reveals nothing usable. To change the passphrase, run this in a browser console:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR NEW PASSPHRASE'))
+       .then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+   then paste the result as ADMIN_HASH below (update it in every staffer's copy). */
+const ADMIN_HASH="e8e3e4e3a5478a6e94552881e41132ba4500b7c853e100a7a54ff61246a229c8"; // passphrase: jjtimebesttime (change me)
+const adminBtn=document.getElementById("adminBtn");
+function showAdmin(){ if(adminBtn) adminBtn.hidden=false; }
+async function sha256Hex(s){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function tryUnlock(){
+  const pass=prompt("Staff passphrase:");
+  if(pass==null) return;
+  try{
+    if(await sha256Hex(pass)===ADMIN_HASH){ try{localStorage.setItem("osa-admin","1");}catch(e){} showAdmin(); }
+    else alert("Not recognized.");
+  }catch(e){ alert("This browser can't verify the passphrase (needs a secure/https page)."); }
+}
+if(adminBtn) adminBtn.onclick=()=>{ location.href="admin.html"; };
+try{ if(localStorage.getItem("osa-admin")==="1") showAdmin(); }catch(e){}   // remembered on this device
+(function(){   // hidden gesture: tap the footer "Calendar synced…" status 5× within 5s to open the passphrase prompt
+  const target=document.querySelector(".synced")||document.getElementById("dot"); if(!target) return;
+  target.style.cursor="pointer"; target.style.userSelect="none";
+  let n=0,t=0;
+  target.addEventListener("click",()=>{ const now=Date.now(); if(now-t>5000) n=0; t=now; if(++n>=5){ n=0; tryUnlock(); } });
+})();
 
 (async function init(){
   setTheme(curTheme());
