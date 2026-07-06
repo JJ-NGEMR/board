@@ -110,18 +110,33 @@
   </div>
 
   <div class="card">
-    <h2>config.json</h2>
-    <pre id="preview"></pre>
+    <h2>Publish</h2>
+    <p class="hint" style="display:block;margin:-6px 0 12px">Click <strong>Save &amp; publish</strong> to push these settings to the live board — it updates in about a minute. Requires the one-time publishing setup below (done once per device/browser).</p>
     <div class="actions">
-      <button class="act primary" id="download">Download config.json</button>
-      <button class="act" id="copy">Copy</button>
+      <button class="act primary" id="publish">Save &amp; publish to board</button>
       <span class="ok" id="okmsg"></span>
     </div>
-    <ol class="steps">
-      <li>Click <strong>Download config.json</strong>.</li>
-      <li>Commit it to the repo <strong>root</strong> (production) — or into <code>test/</code> to try on the test site first.</li>
-      <li>Pages redeploys in ~1 min; refresh the board.</li>
-    </ol>
+
+    <details style="margin-top:14px">
+      <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Publishing setup (one-time per device)</summary>
+      <div class="field" style="margin-top:12px"><label>Publish flow URL <span class="hint">Power Automate HTTP trigger</span></label><input type="text" id="flowUrl" placeholder="https://prod-...logic.azure.com:443/workflows/...&amp;sig=..."></div>
+      <div class="field"><label>Shared secret <span class="hint">must match the secret set in the flow</span></label><input type="password" id="flowSecret" placeholder="shared secret"></div>
+      <div class="actions"><button class="act" id="saveSetup">Save setup on this device</button><span class="ok" id="setupmsg"></span></div>
+      <p class="hint" style="display:block;margin-top:8px">Stored only in this browser (localStorage) — never committed to the repo or visible in page source.</p>
+    </details>
+
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">Or publish manually (download &amp; commit)</summary>
+      <pre id="preview" style="margin-top:12px"></pre>
+      <div class="actions">
+        <button class="act" id="download">Download config.json</button>
+        <button class="act" id="copy">Copy</button>
+      </div>
+      <ol class="steps">
+        <li>Commit it to the repo <strong>root</strong> (production) — or into <code>test/</code> to try on the test site first.</li>
+        <li>Pages redeploys in ~1 min; refresh the board.</li>
+      </ol>
+    </details>
   </div>
 </div>
 
@@ -224,7 +239,33 @@ document.getElementById("download").onclick=()=>{
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="config.json"; a.click(); URL.revokeObjectURL(a.href); flash("Downloaded.");
 };
 document.getElementById("copy").onclick=async()=>{ try{await navigator.clipboard.writeText(JSON.stringify(readForm(),null,2));flash("Copied.");}catch(e){flash("Copy failed — select manually.");} };
-function flash(m){const el=document.getElementById("okmsg");el.textContent=m;setTimeout(()=>el.textContent="",2500);}
+function flash(m){const el=document.getElementById("okmsg");el.textContent=m;setTimeout(()=>el.textContent="",4000);}
+
+/* ---- Save & publish via Power Automate flow ---------------------------------
+   The flow URL + shared secret live ONLY in this browser's localStorage — never in
+   the repo or page source. The flow (an HTTP-triggered Power Automate flow) commits
+   config.json to the repo using a GitHub token held server-side, mirroring the
+   availability.json flow. The POST is a CORS "simple request" (text/plain, no custom
+   headers, no-cors) so the browser sends it without a preflight; the response is
+   opaque, so we report "sent" optimistically. */
+const flowUrlEl=document.getElementById("flowUrl"), flowSecretEl=document.getElementById("flowSecret");
+try{ flowUrlEl.value=localStorage.getItem("osa-flow-url")||""; flowSecretEl.value=localStorage.getItem("osa-flow-secret")||""; }catch(e){}
+document.getElementById("saveSetup").onclick=()=>{
+  const m=document.getElementById("setupmsg");
+  try{ localStorage.setItem("osa-flow-url",flowUrlEl.value.trim()); localStorage.setItem("osa-flow-secret",flowSecretEl.value); m.textContent="Saved on this device."; }
+  catch(e){ m.textContent="Couldn't save (localStorage blocked)."; }
+  setTimeout(()=>m.textContent="",3000);
+};
+document.getElementById("publish").onclick=async()=>{
+  let url="",secret=""; try{ url=(localStorage.getItem("osa-flow-url")||"").trim(); secret=localStorage.getItem("osa-flow-secret")||""; }catch(e){}
+  if(!url){ flash("Set up the publish flow URL first (open “Publishing setup” below)."); return; }
+  const payload=JSON.stringify({secret:secret, config:readForm()});
+  flash("Publishing…");
+  try{
+    await fetch(url,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:payload});
+    flash("Sent — the board updates in about a minute. Refresh it to confirm.");
+  }catch(e){ flash("Publish failed — check the flow URL and your connection."); }
+};
 
 (async function(){
   let c=Object.assign({},DEFAULT_CONFIG);
