@@ -12,7 +12,10 @@
   "schedules": [
     { "dows": [2, 4], "from": "", "to": "", "start": 9, "end": 18 }
   ],
-  "adhoc": [],
+  "adhoc": [
+    { "from": "2026-07-08", "to": "2026-07-08", "start": 9, "end": 18 },
+    { "from": "2026-07-15", "to": "2026-07-15", "start": 9, "end": 18 }
+  ],
   "sanitize": {
     "showTitleDomains": ["synapxe.sg", "singhealth.com.sg"],
     "hideDomains": [],
