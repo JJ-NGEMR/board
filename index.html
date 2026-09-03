@@ -107,6 +107,9 @@
   .block.ooo{background:var(--ooo);color:var(--ooo-ink);box-shadow:inset 4px 0 0 var(--ooo-bar);background-image:repeating-linear-gradient(45deg,color-mix(in srgb,var(--ooo-bar) 16%,transparent) 0 6px,transparent 6px 12px)}
   .block.ooo .lbl{font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
   .block.tent{border:1.5px dashed currentColor;background-image:repeating-linear-gradient(45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px), repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 24%, transparent) 0 5px, transparent 5px 10px)}
+  .block.soft{opacity:.6}          /* day holds / tentatives: still shown, but they claim no time */
+  .block.soft:hover{opacity:1}
+  .col.hasrail::after{content:"";position:absolute;top:0;bottom:0;right:var(--railw);width:0;border-left:1px dashed var(--line);pointer-events:none}
   .block .lbl{padding:2px 6px;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;text-align:center;line-height:1.22}
   .block .lbl-loc{display:block;font-weight:400;font-size:.92em;opacity:.82;margin-top:2px}
   .block.tiny .lbl{display:none}
@@ -126,6 +129,7 @@
   .sw.ooo{background:var(--ooo);box-shadow:inset 3px 0 0 var(--ooo-bar)}
   .sw.busy{background:var(--busy);background-image:repeating-linear-gradient(45deg,rgba(125,125,125,.25) 0 4px,transparent 4px 8px)}
   .sw.tent{border:1px dashed var(--muted);background-image:repeating-linear-gradient(45deg,var(--line) 0 3px,transparent 3px 6px),repeating-linear-gradient(-45deg,var(--line) 0 3px,transparent 3px 6px)}
+  .legend-note{margin:9px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;max-width:78ch}
   footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;font-size:12px;color:var(--muted);flex-wrap:wrap}
   .synced{display:inline-flex;align-items:center;gap:7px}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--free);animation:pulse 2.4s infinite}
@@ -256,6 +260,7 @@
       <span><i class="sw busy"></i> Busy</span>
       <span><i class="sw tent"></i> Tentative (not yet accepted)</span>
     </div>
+    <p class="legend-note" id="legendNote" hidden>All-day holds (and unconfirmed invites) sit in the narrow strip at the right of a column. Staff are reachable during those, so they don't count against open time &mdash; sick and vacation time still does.</p>
   </div>
 
   <div class="banner" id="banner" hidden></div>
@@ -290,6 +295,9 @@ const DEFAULT_CONFIG = {
   weekStartsMonday:true,
   workStart:9, workEnd:18,    // default hour window
   showNowLine:true, showFreeSummary:true, showMutualFree:true,
+  ignoreDayHolds:true,        // all-day / whole-workday block-outs don't count against open time
+  ignoreTentative:true,       // invites that haven't been accepted don't count against open time
+  dayHoldMinHours:7,          // a hold eating at least this many on-site hours counts as a day hold
   schedules:[ {dows:[2,4], from:"", to:"", start:9, end:18} ], // recurring (dow 0=Sun..6=Sat)
   adhoc:[]                    // one-off date ranges with their own hours
 };
@@ -393,6 +401,16 @@ function sampleData(){
   return {updated:new Date().toISOString(), sample:true, days, people};
 }
 
+/* A "day hold" is a background block-out covering essentially the whole on-site day: an all-day
+   event, or the 8–5 / 8–6 / 9–5 / 9–6 kind of hold (an all-day test session, say). Staff are
+   nominally in these but still reachable for a 1:1, so they are drawn on the board yet left out of
+   the free/busy math. Guru/Graph sends all-day holds as timed instants with isAllDay false, so the
+   shape of the block — not the flag — is what identifies them. */
+function isDayHold(b, s, e){
+  if(String(b.allday||"").trim()) return true;                    // explicitly flagged all-day
+  if(s<=DAY_START+1e-9 && e>=DAY_END-1e-9) return true;           // covers the whole on-site window
+  return (e-s) >= num(CONFIG.dayHoldMinHours,7)-1e-9;             // eats nearly all of it
+}
 function blocksFor(person, dayKey){
   const items=[];
   for(const b of ((person&&person.busy)||[])){
@@ -407,17 +425,20 @@ function blocksFor(person, dayKey){
       const s=Math.max(DAY_START, dayKey===sd?hourOf(b.start):DAY_START);
       const e=Math.min(DAY_END,   dayKey===ed?hourOf(b.end):DAY_END);
       if(e<=s) continue;
-      items.push({s, e, label:"", tent:false, loc:"", leave:true});
+      items.push({s, e, label:"", tent:false, loc:"", leave:true, dayHold:false, soft:false});  // leave is real unavailability — never soft
       continue;
     }
     if(dayKeyOf(b.start)!==dayKey) continue;
     const s=Math.max(DAY_START,hourOf(b.start)), e=Math.min(DAY_END,hourOf(b.end));
     if(e<=s) continue;
-    items.push({s, e, label:(b.label||"").trim(), tent:!!String(b.tentative||"").trim(), loc:(b.location||"").trim(), leave});
+    const tent=!!String(b.tentative||"").trim(), dayHold=isDayHold(b,s,e);
+    const soft=(dayHold&&CONFIG.ignoreDayHolds!==false)||(tent&&CONFIG.ignoreTentative!==false);
+    items.push({s, e, label:(b.label||"").trim(), tent, loc:(b.location||"").trim(), leave, dayHold, soft});
   }
   items.sort((a,b)=>a.s-b.s||a.e-b.e);
+  // open time is the complement of the *hard* blocks only — soft ones are drawn but never subtract
   const union=[];
-  for(const b of items){ const last=union[union.length-1]; if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e}); }
+  for(const b of items.filter(x=>!x.soft)){ const last=union[union.length-1]; if(last && b.s<=last.e) last.e=Math.max(last.e,b.e); else union.push({s:b.s,e:b.e}); }
   const free=[]; let cur=DAY_START;
   for(const b of union){ if(b.s>cur) free.push({s:cur,e:b.s}); cur=Math.max(cur,b.e); }
   if(cur<DAY_END) free.push({s:cur,e:DAY_END});
@@ -457,24 +478,35 @@ function layoutColumns(items){
   });
   if(group.length) flush(group);
 }
-function renderCol(elId, person, dayKey){
+/* A column is laid out in two zones side by side: the free/busy timeline on the left, and — only
+   when there are any — a narrow rail on the right holding the soft blocks, so an all-day hold can
+   never bury the open time sitting next to it. railW is the rail's share of the column width; both
+   people use the wider of the two so the columns stay aligned. */
+function columnModel(person, dayKey){
+  const {busy,free}=blocksFor(person,dayKey);
+  const soft=busy.filter(b=>b.soft), hard=busy.filter(b=>!b.soft);
+  layoutColumns(hard); layoutColumns(soft);
+  const cols=soft.reduce((m,b)=>Math.max(m,b._cols||1),0);
+  return {soft, hard, free, railW: soft.length?Math.min(56,12*cols+8):0};
+}
+function renderCol(elId, model, railW){
   const col=document.getElementById(elId);
   col.style.setProperty("--hourpx",HOUR_PX+"px"); col.style.height=(HOURS*HOUR_PX)+"px"; col.innerHTML="";
-  if(!person) return;
-  const {busy,free}=blocksFor(person,dayKey);
-  layoutColumns(busy);
+  col.style.setProperty("--railw",railW+"%");
+  col.classList.toggle("hasrail",railW>0);
+  if(!model) return;
+  const {soft,hard,free}=model;
+  const MAIN={l:0,w:100-railW}, RAIL={l:100-railW,w:railW};
   let n=0;
-  const place=(b,cls,text,laned)=>{
+  const place=(b,cls,text,zone,note)=>{
     const el=document.createElement("div");
     const top=(b.s-DAY_START)*HOUR_PX, h=(b.e-b.s)*HOUR_PX;
     el.className="block "+cls+(h<22?" tiny":"");
     el.style.top=top+"px"; el.style.height=(h-2)+"px"; el.style.animationDelay=(n++*40)+"ms";
-    if(laned && b._cols>1){            // concurrent → split into lanes
-      const w=100/b._cols;
-      el.style.left="calc("+(b._col*w)+"% + 3px)";
-      el.style.width="calc("+w+"% - 6px)";
-      el.style.right="auto";
-    }
+    const cols=Math.max(1,b._cols||1), w=zone.w/cols;   // concurrent blocks split their zone into lanes
+    el.style.left="calc("+(zone.l+(b._col||0)*w)+"% + 3px)";
+    el.style.width="calc("+w+"% - 6px)";
+    el.style.right="auto";
     const range=fmt(b.s)+'–'+fmt(b.e);
     // for a full-window leave the 9–6 range is redundant; only show a time when the leave sits partway into the window (half-day / boundary)
     const showRange = !(cls.indexOf("ooo")!==-1 && b.s<=DAY_START+1e-9 && b.e>=DAY_END-1e-9);
@@ -482,14 +514,19 @@ function renderCol(elId, person, dayKey){
     let html='<span class="lbl">'+core, tip=tipCore;
     if(b.loc && cls.indexOf("cust")!==-1){ html+='<span class="lbl-loc">'+esc(b.loc)+'</span>'; tip+=' · '+b.loc; }
     html+='</span>';
-    el.title=tip;            // full, untruncated text on hover (covers any clipped label)
+    el.title=tip+(note?' · '+note:'');   // full, untruncated text on hover (covers any clipped label)
     el.innerHTML=html;
     col.appendChild(el);
   };
-  free.forEach(b=>place(b,"free","Free",false));
-  busy.forEach(b=>{
+  soft.forEach(b=>{
+    const cls = (b.label?"cust":"busy")+(b.tent?" tent":"")+" soft";
+    place(b, cls, b.label||(b.tent?"Tentative":"Hold"), RAIL,
+          b.dayHold ? "all-day hold — still open for a 1:1" : "tentative — not confirmed");
+  });
+  free.forEach(b=>place(b,"free","Free",MAIN));
+  hard.forEach(b=>{
     const cls = b.leave ? "ooo" : ((b.label?"cust":"busy")+(b.tent?" tent":""));
-    place(b, cls, b.leave ? "On leave" : (b.label||"Busy"), true);
+    place(b, cls, b.leave ? "On leave" : (b.label||"Busy"), MAIN);
   });
 }
 function renderNowLine(isToday){
@@ -538,7 +575,8 @@ function renderDay(){
     grid.innerHTML=`<div class="empty" style="grid-column:1/-1">${(DATA&&DATA.available===false)?"Availability isn't published for this team.":"No on-site days in the configured range."}</div>`;
     document.getElementById("dow").textContent="—"; document.getElementById("date").textContent="";
     document.getElementById("prev").disabled=true; document.getElementById("next").disabled=true;
-    document.getElementById("mutual").hidden=true; return;
+    document.getElementById("mutual").hidden=true;
+    document.getElementById("legendNote").hidden=true; return;
   }
   if(idx<0||idx>=AVAIL.length) idx=defaultIndex();
   const dk=AVAIL[idx], d=parseKey(dk), isToday=(dk===todayKey());
@@ -553,8 +591,11 @@ function renderDay(){
   document.getElementById("sum0").textContent = freeSummary(p0,dk,isToday);
   document.getElementById("sum1").textContent = freeSummary(p1,dk,isToday);
   renderMutual(p0,p1,dk,isToday);
-  renderCol("col0", p0, dk, isToday);
-  renderCol("col1", p1, dk, isToday);
+  const m0=p0?columnModel(p0,dk):null, m1=p1?columnModel(p1,dk):null;
+  const railW=Math.max(m0?m0.railW:0, m1?m1.railW:0);
+  renderCol("col0", m0, railW);
+  renderCol("col1", m1, railW);
+  document.getElementById("legendNote").hidden = !railW;
   renderNowLine(isToday);
 }
 function relTime(iso){ const s=Math.round((Date.now()-new Date(iso).getTime())/1000); if(s<60)return"just now"; if(s<3600)return Math.floor(s/60)+" min ago"; if(s<86400)return Math.floor(s/3600)+" hr ago"; return Math.floor(s/86400)+" d ago"; }

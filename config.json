@@ -9,6 +9,9 @@
   "showNowLine": true,
   "showFreeSummary": true,
   "showMutualFree": true,
+  "ignoreDayHolds": true,
+  "ignoreTentative": true,
+  "dayHoldMinHours": 7,
   "schedules": [
     { "dows": [2, 4], "from": "", "to": "", "start": 9, "end": 18 }
   ],

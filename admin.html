@@ -103,6 +103,16 @@
   </div>
 
   <div class="card">
+    <h2>Open-time rules</h2>
+    <p class="hint" style="display:block;margin:-6px 0 12px">Which calendar entries make you look booked. Anything excluded here still appears on the board &mdash; in a narrow strip at the right of your column &mdash; it just doesn't eat your open time. Sick and vacation time always counts as unavailable.</p>
+    <label class="toggle"><input type="checkbox" id="ignoreDayHolds"><span><span class="t-label">Ignore all-day / whole-workday holds</span><br><span class="t-desc">All-day events and long block-outs (8&ndash;5, 8&ndash;6, 9&ndash;5, 9&ndash;6 &hellip;) &mdash; the all-day test sessions you're nominally in but still reachable during.</span></span></label>
+    <div class="field"><label>Counts as a whole-workday hold at <span class="hint">hours of the visible day, or more</span></label>
+      <div class="numwrap"><input type="number" id="dayHoldMinHours" min="1" max="24" step="0.5"><span class="unit">hours</span></div>
+      <div class="hint">A hold that also covers the entire visible window always counts, however short that window is.</div></div>
+    <label class="toggle"><input type="checkbox" id="ignoreTentative"><span><span class="t-label">Ignore tentative invites</span><br><span class="t-desc">Meetings not yet accepted don't count as busy.</span></span></label>
+  </div>
+
+  <div class="card">
     <h2>Analyst features</h2>
     <label class="toggle"><input type="checkbox" id="showNowLine"><span><span class="t-label">Current-time line</span><br><span class="t-desc">Marker on today's column showing "now."</span></span></label>
     <label class="toggle"><input type="checkbox" id="showFreeSummary"><span><span class="t-label">Next-free / hours-open summary</span><br><span class="t-desc">Under each name: next open slot and total open hours.</span></span></label>
@@ -142,7 +152,7 @@
 
 <script>
 const DOWS=[["Mon",1],["Tue",2],["Wed",3],["Thu",4],["Fri",5],["Sat",6],["Sun",0]];
-const DEFAULT_CONFIG={title:"Jacob and Julia's Onsite Availability",eyebrow:"SingHealth NGEMR",viewBack:0,viewAhead:4,weekStartsMonday:true,workStart:9,workEnd:18,showNowLine:true,showFreeSummary:true,showMutualFree:true,schedules:[{dows:[2,4],from:"",to:"",start:9,end:18}],adhoc:[],sanitize:{showTitleDomains:[],hideDomains:[],showOrganizer:false}};
+const DEFAULT_CONFIG={title:"Jacob and Julia's Onsite Availability",eyebrow:"SingHealth NGEMR",viewBack:0,viewAhead:4,weekStartsMonday:true,workStart:9,workEnd:18,showNowLine:true,showFreeSummary:true,showMutualFree:true,ignoreDayHolds:true,ignoreTentative:true,dayHoldMinHours:7,schedules:[{dows:[2,4],from:"",to:"",start:9,end:18}],adhoc:[],sanitize:{showTitleDomains:[],hideDomains:[],showOrganizer:false}};
 
 function val(id){return document.getElementById(id).value;}
 function chk(id){return document.getElementById(id).checked;}
@@ -205,6 +215,7 @@ function readForm(){
     weekStartsMonday:val("weekStartsMonday")==="true",
     workStart:Number(val("workStart")), workEnd:Number(val("workEnd")),
     showNowLine:chk("showNowLine"), showFreeSummary:chk("showFreeSummary"), showMutualFree:chk("showMutualFree"),
+    ignoreDayHolds:chk("ignoreDayHolds"), ignoreTentative:chk("ignoreTentative"), dayHoldMinHours:Number(val("dayHoldMinHours"))||7,
     schedules:readSchedules(), adhoc:readAdhoc(),
     sanitize:{ showTitleDomains:parseDomains(val("showTitleDomains")), hideDomains:parseDomains(val("hideDomains")), showOrganizer:chk("showOrganizer") }
   };
@@ -222,6 +233,9 @@ function writeForm(c){
   document.getElementById("showNowLine").checked=c.showNowLine!==false;
   document.getElementById("showFreeSummary").checked=c.showFreeSummary!==false;
   document.getElementById("showMutualFree").checked=c.showMutualFree!==false;
+  document.getElementById("ignoreDayHolds").checked=c.ignoreDayHolds!==false;
+  document.getElementById("ignoreTentative").checked=c.ignoreTentative!==false;
+  document.getElementById("dayHoldMinHours").value=Number(c.dayHoldMinHours)||7;
   const san=c.sanitize||{};
   document.getElementById("showTitleDomains").value=joinDomains(san.showTitleDomains);
   document.getElementById("hideDomains").value=joinDomains(san.hideDomains);
@@ -232,7 +246,7 @@ function writeForm(c){
 
 document.getElementById("addSchedule").onclick=()=>{ document.getElementById("schedules").appendChild(scheduleRow()); refresh(); };
 document.getElementById("addAdhoc").onclick=()=>{ document.getElementById("adhoc").appendChild(adhocRow()); refresh(); };
-["title","eyebrow","viewBack","viewAhead","weekStartsMonday","workStart","workEnd","showNowLine","showFreeSummary","showMutualFree","showTitleDomains","hideDomains","showOrganizer"].forEach(id=>{const el=document.getElementById(id);el.addEventListener("input",refresh);el.addEventListener("change",refresh);});
+["title","eyebrow","viewBack","viewAhead","weekStartsMonday","workStart","workEnd","showNowLine","showFreeSummary","showMutualFree","ignoreDayHolds","ignoreTentative","dayHoldMinHours","showTitleDomains","hideDomains","showOrganizer"].forEach(id=>{const el=document.getElementById(id);el.addEventListener("input",refresh);el.addEventListener("change",refresh);});
 
 document.getElementById("download").onclick=()=>{
   const blob=new Blob([JSON.stringify(readForm(),null,2)],{type:"application/json"});
